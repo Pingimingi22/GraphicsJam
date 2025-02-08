@@ -58,7 +58,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include; $(SolutionDir)ThirdParty\GLAD\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include;$(SolutionDir)ThirdParty\GLM;$(SolutionDir)ThirdParty\GLAD\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -72,7 +72,7 @@
       <Command>if not exist $(LocalDebuggerWorkingDirectory) mkdir $(LocalDebuggerWorkingDirectory)</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>if exist $(LocalDebuggerWorkingDirectory) xcopy $(OutDir)  /Y /I /E</Command>
+      <Command>if exist $(LocalDebuggerWorkingDirectory) xcopy $(LocalDebuggerWorkingDirectory) $(OutDir)  /Y /I /E</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -83,7 +83,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include; $(SolutionDir)ThirdParty\GLAD\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include;$(SolutionDir)ThirdParty\GLM;$(SolutionDir)ThirdParty\GLAD\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -99,7 +99,7 @@
       <Command>if not exist $(LocalDebuggerWorkingDirectory) mkdir $(LocalDebuggerWorkingDirectory)</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>if exist $(LocalDebuggerWorkingDirectory) xcopy $(OutDir)  /Y /I /E</Command>
+      <Command>if exist $(LocalDebuggerWorkingDirectory) xcopy $(LocalDebuggerWorkingDirectory) $(OutDir)  /Y /I /E</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
