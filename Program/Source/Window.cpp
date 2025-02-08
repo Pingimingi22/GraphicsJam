@@ -142,3 +142,13 @@ bool Window::ShouldClose()
 	// Detects when the user clicks on the X button
 	return glfwWindowShouldClose(m_NativeWindow);
 }
+
+uint32_t Window::Width() const
+{
+	return m_Width;
+}
+
+uint32_t Window::Height() const
+{
+	return m_Height;
+}

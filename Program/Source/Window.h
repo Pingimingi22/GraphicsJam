@@ -18,8 +18,11 @@ public:
 	bool ShouldClose();
 	bool Initialised() const { return m_Initialised; }
 
-private:
+	uint32_t Width() const;
+	uint32_t Height() const;
+
 	GLFWwindow* m_NativeWindow;
+private:
 	uint32_t m_Width, m_Height;
 	std::string m_Title;
 	bool m_Initialised = false;
