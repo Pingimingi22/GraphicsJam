@@ -59,8 +59,54 @@ void Renderer::Init(const Window& window)
 
 	// Vertex shader ---------------------------------
 
-	std::string vertexShaderSource = ReadShader("vertexShader.vsh");
 	
+	{
+		unsigned int vertexShader = CreateVertexShader("vertexShader.vsh");
+		unsigned int fragmentShader = CreateFragmentShader("fragmentShader.fsh");
+		_basicShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
+
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+	}
+
+	{
+		unsigned int vertexShader = CreateVertexShader("vertexShader.vsh");
+		unsigned int fragmentShader = CreateFragmentShader("flipbook.fsh");
+		unsigned int flipbookShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
+
+		_flipbookShaderProgram = flipbookShaderProgram;
+
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+	}
+
+
+	// ------------------------
+
+	float halfWidth = 0.5f * 75;
+	float halfHeight = (float)window.Height()/window.Width() * 75;
+	camera.projectionMatrix = glm::ortho(-halfWidth, halfWidth, -halfHeight/2, halfHeight/2, -100.0f, 100.0f);
+	//camera.projectionMatrix = glm::ortho(0.0f, 1.0f * 10, 0.0f, (float)window.Height()/window.Width() * 10, -100.0f, 100.0f);
+	camera.position = glm::vec3(0.0f, 0.0f, 10.0f);
+
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glUniform1i(glGetUniformLocation(shaderProgram, "ourTexture"), 0);
+}
+
+void Renderer::Draw(Sprite sprite, float deltaTime)
+{
+	ConfigureShader(_basicShaderProgram, sprite._texId, sprite.ObjToWorld());
+
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+unsigned int Renderer::CreateVertexShader(std::string path)
+{
+	// Vertex shader ---------------------------------
+
+	std::string vertexShaderSource = ReadShader(path);
+
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
 	const char* vertexShaderSourceC = vertexShaderSource.c_str();
@@ -77,9 +123,14 @@ void Renderer::Init(const Window& window)
 			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 		}
 	}
-	
+
+	return vertexShader;
+}
+
+unsigned int Renderer::CreateFragmentShader(std::string path)
+{
 	// Fragment shader ---------------------------------
-	std::string fragmentShaderSource = ReadShader("fragmentShader.fsh");
+	std::string fragmentShaderSource = ReadShader(path);
 
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -98,53 +149,50 @@ void Renderer::Init(const Window& window)
 		}
 	}
 
+	return fragmentShader;
+}
+
+unsigned int Renderer::CreateShaderProgram(unsigned int vertexShader, unsigned int fragmentShader)
+{
 	// Creating the shader program.
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
+	unsigned int newShaderProgram = glCreateProgram();
+	glAttachShader(newShaderProgram, vertexShader);
+	glAttachShader(newShaderProgram, fragmentShader);
+	glLinkProgram(newShaderProgram);
 
 	int success;
 	char infoLog[512];
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+	glGetProgramiv(newShaderProgram, GL_LINK_STATUS, &success);
 	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		glGetProgramInfoLog(newShaderProgram, 512, NULL, infoLog);
 	}
 
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	// ------------------------
-
-	float halfWidth = 0.5f * 75;
-	float halfHeight = (float)window.Height()/window.Width() * 75;
-	camera.projectionMatrix = glm::ortho(-halfWidth, halfWidth, -halfHeight/2, halfHeight/2, -100.0f, 100.0f);
-	//camera.projectionMatrix = glm::ortho(0.0f, 1.0f * 10, 0.0f, (float)window.Height()/window.Width() * 10, -100.0f, 100.0f);
-	camera.position = glm::vec3(0.0f, 0.0f, 10.0f);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glUniform1i(glGetUniformLocation(shaderProgram, "ourTexture"), 0);
+	return newShaderProgram;
 }
 
-void Renderer::Draw(Sprite sprite, float deltaTime)
+void Renderer::ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat)
 {
-	// bind vao
-	// bind vbo
-	// bind texture
-	// bind shader
-	// set shader uniform, mvp matrix, texture unit
-	// draw
-
 	glUseProgram(shaderProgram);
 
 	// Apply uniforms.
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMat"), 1, GL_FALSE, &sprite.ObjToWorld()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMat"), 1, GL_FALSE, &modelMat[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "viewMat"), 1, GL_FALSE, &camera.GetViewMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, &camera.projectionMatrix[0][0]);
 
-	glBindTexture(GL_TEXTURE_2D, sprite._texId);
+	glBindTexture(GL_TEXTURE_2D, texture);
+}
+
+void Renderer::Draw(SpriteAnimated sprite, float deltaTime)
+{
+	ConfigureShader(_flipbookShaderProgram, sprite._texId, sprite.ObjToWorld());
+
+	glUniform1i(glGetUniformLocation(_flipbookShaderProgram, "frames"), 8);
+
+	// x = 0 + (coord - 0) * ( (1/frames - 0) / (1 - 0) )
+	// x = coord * (1/frames) / 1
+	// x = coord * (1/frames)
+
 	glBindVertexArray(VAO);
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 

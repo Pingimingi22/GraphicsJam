@@ -109,6 +109,7 @@
     <ClCompile Include="Source\Window.cpp" />
     <ClCompile Include="Source\Sprite.cpp" />
     <ClCompile Include="Source\World.cpp" />
+    <ClCompile Include="Source\SpriteAnimated.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Renderer.h" />
@@ -116,6 +117,7 @@
     <ClInclude Include="Source\Window.h" />
     <ClInclude Include="Source\Sprite.h" />
     <ClInclude Include="Source\World.h" />
+    <ClInclude Include="Source\SpriteAnimated.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

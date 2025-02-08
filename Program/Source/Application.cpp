@@ -32,12 +32,44 @@ void Application::Run()
 	
 	double previousTime = glfwGetTime();
 
+	SpriteAnimated player = SpriteAnimated("Soldier-Walk.png", glm::vec3(0.0f, 0.0f, 0.0f));
+	player._scale = glm::vec3(10.0f, 10.0f, 1.0f);
+	player.frames = 8;
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glm::vec2 velocity = glm::vec2(0);
+	float playerSpeed = 5;
+
 	while (!m_Window->ShouldClose())
 	{
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - previousTime;
 
-		m_Window->ProcessEvents();
+		velocity = glm::vec2(0);
+
+		if (glfwGetKey(m_Window->m_NativeWindow, GLFW_KEY_W) == GLFW_PRESS) {
+			velocity.y += 1.0f * deltaTime * playerSpeed;
+		}
+		if (glfwGetKey(m_Window->m_NativeWindow, GLFW_KEY_S) == GLFW_PRESS) {
+			velocity.y -= 1.0f * deltaTime * playerSpeed;
+		}
+		if (glfwGetKey(m_Window->m_NativeWindow, GLFW_KEY_D) == GLFW_PRESS) {
+			velocity.x += 1.0f * deltaTime * playerSpeed;
+		}
+		if (glfwGetKey(m_Window->m_NativeWindow, GLFW_KEY_A) == GLFW_PRESS) {
+			velocity.x -= 1.0f * deltaTime * playerSpeed;
+		}
+
+		if (velocity.x < 0) {
+			player._scale.x = -10;
+		}
+		else if(velocity.x > 0) {
+			player._scale.x = 10;
+		}
+
+		player._position += glm::vec3(velocity.x, velocity.y, 0);
 
 		// This function should *ideally* not exist in the window class and would
 		// be better suited within a Renderer or Surface class. However, for the
@@ -47,6 +79,9 @@ void Application::Run()
 		for (int i = 0; i < world.sprites.size(); i++) {
 			test.Draw(world.sprites[i], deltaTime);
 		}
+		test.Draw(player, deltaTime);
+		
+		m_Window->ProcessEvents();
 
 		m_Window->SwapBuffers();
 

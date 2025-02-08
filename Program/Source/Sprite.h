@@ -15,6 +15,8 @@ public:
 
 	float rotation;
 	glm::vec3 _position = glm::vec3(0.0f);
+	glm::vec3 _scale = glm::vec3(1.0f);
+
 	glm::mat4 ObjToWorld();
 	glm::mat4 WorldToObj();
 };
