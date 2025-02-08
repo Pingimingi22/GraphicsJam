@@ -1,0 +1,46 @@
+#-------------------------------------------------------------------
+# Project
+#-------------------------------------------------------------------
+
+# The output directory for all builds
+Builds/
+
+#-------------------------------------------------------------------
+# Visual Studio IDE
+#-------------------------------------------------------------------
+
+# Typical suspects
+.vs/
+#*.filters
+#*.sln
+*.user
+#*.vcxproj
+
+# Don't need to know what you've been up to
+.localhistory/
+.vshistory/
+
+# Backups? I prefer git
+_UpgradeReport_Files/
+Backup*/
+ServiceFabricBackup/
+*.rptproj.bak
+UpgradeLog*.htm
+UpgradeLog*.XML
+
+#-------------------------------------------------------------------
+# Visual Studio Code
+#-------------------------------------------------------------------
+
+# Settings to track
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+
+# Workspaces. Meh.
+*.code-workspace
+
+# See the comment above for '.vshistory/'
+.history/
