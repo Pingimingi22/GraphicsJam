@@ -2,6 +2,7 @@
 #include "glm/vec2.hpp"
 #include "Sprite.h"
 #include <vector>
+#include "box2d/box2d.h"
 
 class World
 {
@@ -13,6 +14,6 @@ public:
 
 	std::vector<Sprite> sprites;
 	
-	void Init();
+	void Init(b2WorldId worldId);
 };
 

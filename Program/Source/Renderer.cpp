@@ -187,6 +187,7 @@ void Renderer::Draw(SpriteAnimated sprite, float deltaTime)
 	ConfigureShader(_flipbookShaderProgram, sprite._texId, sprite.ObjToWorld());
 
 	glUniform1i(glGetUniformLocation(_flipbookShaderProgram, "frames"), 8);
+	glUniform1i(glGetUniformLocation(_flipbookShaderProgram, "currentFrame"), sprite.frameIndex);
 
 	// x = 0 + (coord - 0) * ( (1/frames - 0) / (1 - 0) )
 	// x = coord * (1/frames) / 1
