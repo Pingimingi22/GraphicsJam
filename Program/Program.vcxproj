@@ -103,6 +103,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\PhysicsBody.cpp" />
+    <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\EntryPoint.cpp" />
@@ -112,6 +114,8 @@
     <ClCompile Include="Source\SpriteAnimated.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\PhysicsBody.h" />
+    <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Window.h" />

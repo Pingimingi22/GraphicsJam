@@ -1,29 +1,9 @@
 #include "Sprite.h"
 
-Sprite::Sprite(std::string texturePath, glm::vec3 position, b2WorldId worldId, b2BodyType type)
+Sprite::Sprite(std::string texturePath, glm::vec3 position)
 {
-
 	_position = position;
 	rotation = 0.0f;
-
-	b2BodyDef bodyDef = b2DefaultBodyDef();
-	bodyDef.type = type;
-	b2Vec2 bodyPosition;
-	bodyPosition.x = position.x;
-	bodyPosition.y = position.y;
-	bodyDef.position = bodyPosition;
-	bodyDef.fixedRotation = true;
-	b2Polygon dynamicBox = b2MakeRoundedBox(0.5f, 0.5f, 0.25f);
-
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	shapeDef.density = 1.0f;
-	shapeDef.friction = 0.1f;
-	
-
-	_bodyId = b2CreateBody(worldId, &bodyDef);
-
-	b2CreatePolygonShape(_bodyId, &shapeDef, &dynamicBox);
-
 
 	int width, height, nrChannels;
 
@@ -47,15 +27,45 @@ Sprite::Sprite(std::string texturePath, glm::vec3 position, b2WorldId worldId, b
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
+GLuint Sprite::GetTextureId()
+{
+	return _texId;
+}
+
+glm::vec2 Sprite::GetPosition()
+{
+	return glm::vec2(_position.x, _position.y);
+}
+
+void Sprite::SetPosition(glm::vec2 newPosition)
+{
+	_position.x = newPosition.x;
+	_position.y = newPosition.y;
+}
+
+void Sprite::SetScale(float uniformScale)
+{
+	_scale.x = uniformScale;
+	_scale.y = uniformScale;
+	_scale.z = 1.0f;
+}
+
+void Sprite::SetScale(glm::vec2 nonUniformScale)
+{
+	_scale.x = nonUniformScale.x;
+	_scale.y = nonUniformScale.y;
+	_scale.z = 1.0f;
+}
+
 glm::mat4 Sprite::ObjToWorld()
 {
-	b2Vec2 bodyPosition = b2Body_GetPosition(_bodyId);
-	glm::vec4 physicsPosition = glm::vec4(bodyPosition.x, bodyPosition.y, 0.0f, 1.0f);
-
-	_position.x = bodyPosition.x;
-	_position.y = bodyPosition.y;
 	glm::mat4 modelMat = glm::translate(glm::mat4(1.0f), _position) * 
 						 glm::scale(glm::mat4(1.0f), _scale) * 
 						 glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0.0f, 0.0f, 1.0f));
 	return modelMat;
+}
+
+glm::mat4 Sprite::WorldToObj()
+{
+	return glm::inverse(ObjToWorld());
 }

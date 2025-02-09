@@ -95,7 +95,10 @@ void Renderer::Init(const Window& window)
 
 void Renderer::Draw(Sprite sprite, float deltaTime)
 {
-	ConfigureShader(_basicShaderProgram, sprite._texId, sprite.ObjToWorld());
+	ConfigureShader(
+		_basicShaderProgram, 
+		sprite.GetTextureId(), 
+		sprite.ObjToWorld());
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -184,14 +187,19 @@ void Renderer::ConfigureShader(unsigned int shaderProgram, unsigned int texture,
 
 void Renderer::Draw(SpriteAnimated sprite, float deltaTime)
 {
-	ConfigureShader(_flipbookShaderProgram, sprite._texId, sprite.ObjToWorld());
+	ConfigureShader(
+		_flipbookShaderProgram, 
+		sprite.GetTextureId(), 
+		sprite.ObjToWorld());
 
-	glUniform1i(glGetUniformLocation(_flipbookShaderProgram, "frames"), 8);
-	glUniform1i(glGetUniformLocation(_flipbookShaderProgram, "currentFrame"), sprite.frameIndex);
-
-	// x = 0 + (coord - 0) * ( (1/frames - 0) / (1 - 0) )
-	// x = coord * (1/frames) / 1
-	// x = coord * (1/frames)
+	glUniform1i(glGetUniformLocation(
+		_flipbookShaderProgram, 
+		"frames"), 
+		8);
+	glUniform1i(glGetUniformLocation(
+		_flipbookShaderProgram, 
+		"currentFrame"), 
+		sprite.GetCurrentFrameIndex());
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
