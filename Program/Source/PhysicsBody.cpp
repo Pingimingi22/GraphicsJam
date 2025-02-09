@@ -50,7 +50,7 @@ PhysicsBody::PhysicsBody(
 	bodyDef.fixedRotation = true;
 
 	b2Circle dynamicCircle;
-	dynamicCircle.radius = 1.0f;
+	dynamicCircle.radius = radius;
 	dynamicCircle.center = b2Vec2_zero;
 
 	b2ShapeDef shapeDef = b2DefaultShapeDef();

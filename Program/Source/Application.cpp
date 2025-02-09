@@ -84,7 +84,7 @@ void Application::Run()
 		worldId,
 		b2_dynamicBody,
 		glm::vec2(0.0f, 10.0f),
-		10.0f);
+		5.0f);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
