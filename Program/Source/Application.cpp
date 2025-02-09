@@ -80,6 +80,12 @@ void Application::Run()
 		0.4f);
 	floorPhysics.SetPosition(glm::vec2(0.0f, -10.0f));
 
+	PhysicsBody randomCircle = PhysicsBody(
+		worldId,
+		b2_dynamicBody,
+		glm::vec2(0.0f, 10.0f),
+		10.0f);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -117,6 +123,8 @@ void Application::Run()
 			renderer.DrawGizmo(player.GetPhysicsBody(), glm::vec3(0.0f, 1.0f, 0.0f));
 			renderer.DrawGizmo(floorPhysics, glm::vec3(0.95f, 0.44f, 0.91f));
 		}
+
+		renderer.DrawGizmo(randomCircle, glm::vec3(1.0f, 0.0f, 0.0f));
 		
 		m_Window->ProcessEvents();
 

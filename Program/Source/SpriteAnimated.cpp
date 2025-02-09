@@ -23,5 +23,5 @@ int SpriteAnimated::GetCurrentFrameIndex()
 
 void SpriteAnimated::SetCurrentFrameIndex(int frame)
 {
-	_frameIndex = frame % (_frames+1);
+	_frameIndex = frame % (_frames);
 }

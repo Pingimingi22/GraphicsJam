@@ -12,6 +12,11 @@ public:
 		glm::vec2 initialPos,
 		float halfWidth,
 		float halfHeight);
+	PhysicsBody(
+		b2WorldId world,
+		b2BodyType type,
+		glm::vec2 initialPos,
+		float radius);
 
 	b2BodyId GetId();
 	b2ShapeId GetShapeId();

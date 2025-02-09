@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include <iostream>
 #include <fstream>
+#include "box2d/types.h"
 
 
 static float _quadVertices[] =
@@ -65,13 +66,35 @@ void Renderer::Init(const Window& window)
 	glEnableVertexAttribArray(1);
 
 	// ---------------------------- Testing line drawing gizmo stuff
-	glGenVertexArrays(1, &_testVAO);
-	glBindVertexArray(_testVAO);
+	glGenVertexArrays(1, &_lineRenderVAO);
+	glBindVertexArray(_lineRenderVAO);
 
-	glGenBuffers(1, &_testVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, _testVBO);
+	glGenBuffers(1, &_lineRenderVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _lineRenderVBO);
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(_quadVertices), _outlineShape, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// -------------------------------
+
+	// ------------------------------- Testing creating circle verts
+
+	glm::vec4 unitVec = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+	for (int i = 0; i < 360; i++) {
+		float toRadians = 3.14159265f / 180;
+		glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), (float)i * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::vec3 newPoint = rotate * unitVec;
+		_unitCircleVerts.push_back(newPoint);
+	}
+	glGenVertexArrays(1, &_circleRenderVAO);
+	glBindVertexArray(_circleRenderVAO);
+
+	glGenBuffers(1, &_circleRenderVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _circleRenderVBO);
+
+	glBufferData(GL_ARRAY_BUFFER, _unitCircleVerts.size() * sizeof(float) * 3, _unitCircleVerts.data(), GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -139,38 +162,71 @@ void Renderer::Draw(Sprite sprite, float deltaTime)
 void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 {
 	b2Vec2 bodyPos = b2Body_GetPosition(body.GetId());
-	
-	b2AABB aabb = b2Shape_GetAABB(body.GetShapeId());
+	b2ShapeType shapeType = b2Shape_GetType(body.GetShapeId());
 
-	b2Vec2 aabbCentre = b2AABB_Center(aabb);
-	b2Vec2 aabbsExtents = b2AABB_Extents(aabb);
+	if (shapeType == b2_circleShape) {
+		b2Circle circle = b2Shape_GetCircle(body.GetShapeId());
+		b2Vec2 circleCentre = b2Body_GetPosition(body.GetId());
+		float circleRadius = circle.radius;
 
-	glm::vec3 topLeft;
-	glm::vec3 topRight;
-	glm::vec3 bottomLeft;
-	glm::vec3 bottomRight;
+		glm::vec3 topLeft;
+		glm::vec3 topRight;
+		glm::vec3 bottomLeft;
+		glm::vec3 bottomRight;
 
-	glm::mat4 modelMat =
-		glm::translate(
-			glm::mat4(1.0f),
-			glm::vec3(aabbCentre.x, aabbCentre.y, 0.0f)) *
-		glm::scale(
-			glm::mat4(1.0f),
-			glm::vec3(aabbsExtents.x*2, aabbsExtents.y*2, 1.0f));
+		glm::mat4 modelMat =
+			glm::translate(
+				glm::mat4(1.0f),
+				glm::vec3(circleCentre.x, circleCentre.y, 0.0f)) *
+			glm::scale(
+				glm::mat4(1.0f),
+				glm::vec3(circleRadius, circleRadius, 1.0f));
 
-	ConfigureShader(
-		_lineShaderProgram,
-		-1,
-		modelMat);
+		ConfigureShader(
+			_lineShaderProgram,
+			-1,
+			modelMat);
 
-	glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"), 
-									 colour.x, colour.y, colour.z);
+		glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"),
+			colour.x, colour.y, colour.z);
 
-	glBindVertexArray(_testVAO);
+		glBindVertexArray(_circleRenderVAO);
 
-	glLineWidth(2.0f);
-	
-	glDrawArrays(GL_LINE_LOOP, 0, 6);
+		glLineWidth(2.0f);
+		glDrawArrays(GL_LINE_LOOP, 0, _unitCircleVerts.size());
+	}
+	else if (shapeType == b2_polygonShape) {
+		b2AABB aabb = b2Shape_GetAABB(body.GetShapeId());
+		b2Vec2 aabbCentre = b2AABB_Center(aabb);
+		b2Vec2 aabbsExtents = b2AABB_Extents(aabb);
+
+		glm::vec3 topLeft;
+		glm::vec3 topRight;
+		glm::vec3 bottomLeft;
+		glm::vec3 bottomRight;
+
+		glm::mat4 modelMat =
+			glm::translate(
+				glm::mat4(1.0f),
+				glm::vec3(aabbCentre.x, aabbCentre.y, 0.0f)) *
+			glm::scale(
+				glm::mat4(1.0f),
+				glm::vec3(aabbsExtents.x * 2, aabbsExtents.y * 2, 1.0f));
+
+		ConfigureShader(
+			_lineShaderProgram,
+			-1,
+			modelMat);
+
+		glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"),
+			colour.x, colour.y, colour.z);
+
+		glBindVertexArray(_lineRenderVAO);
+
+		glLineWidth(2.0f);
+
+		glDrawArrays(GL_LINE_LOOP, 0, 6);
+	}
 }
 
 unsigned int Renderer::CreateVertexShader(std::string path)

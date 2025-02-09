@@ -32,6 +32,38 @@ PhysicsBody::PhysicsBody(
 
 	_shapeId = b2CreatePolygonShape(_bodyId, &shapeDef, &dynamicBox);
 }
+PhysicsBody::PhysicsBody(
+	b2WorldId world,
+	b2BodyType type,
+	glm::vec2 initialPos,
+	float radius)
+{
+	b2BodyDef bodyDef = b2DefaultBodyDef();
+	bodyDef.type = type;
+
+	b2Vec2 bodyPosition;
+	bodyPosition.x = initialPos.x;
+	bodyPosition.y = initialPos.y;
+	bodyDef.position = bodyPosition;
+
+	// Freeze rotation
+	bodyDef.fixedRotation = true;
+
+	b2Circle dynamicCircle;
+	dynamicCircle.radius = 1.0f;
+	dynamicCircle.center = b2Vec2_zero;
+
+	b2ShapeDef shapeDef = b2DefaultShapeDef();
+
+	shapeDef.enableContactEvents = true;
+	shapeDef.density = 1.0f;
+	shapeDef.friction = 0.0f;
+
+	_bodyId = b2CreateBody(world, &bodyDef);
+	_worldId = world;
+
+	_shapeId = b2CreateCircleShape(_bodyId, &shapeDef, &dynamicCircle);
+}
 
 b2BodyId PhysicsBody::GetId()
 {

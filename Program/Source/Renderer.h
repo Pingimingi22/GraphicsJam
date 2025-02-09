@@ -7,6 +7,7 @@
 #include "Window.h"
 #include "SpriteAnimated.h"
 #include "PhysicsBody.h"
+#include "glm/common.hpp"
 
 class Renderer
 {
@@ -21,8 +22,11 @@ private:
 
 	std::string ReadShader(std::string path);
 
-	unsigned int _testVBO;
-	unsigned int _testVAO;
+	unsigned int _lineRenderVBO;
+	unsigned int _lineRenderVAO;
+
+	unsigned int _circleRenderVBO;
+	unsigned int _circleRenderVAO;
 
 public:
 	class Camera
@@ -51,5 +55,7 @@ private:
 	unsigned int CreateFragmentShader(std::string path);
 
 	unsigned int CreateShaderProgram(unsigned int vertexShader, unsigned int fragmentShader);
+
+	std::vector<glm::vec3> _unitCircleVerts;
 };
 
