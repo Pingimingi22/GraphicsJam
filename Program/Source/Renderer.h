@@ -6,6 +6,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Window.h"
 #include "SpriteAnimated.h"
+#include "PhysicsBody.h"
 
 class Renderer
 {
@@ -13,10 +14,15 @@ class Renderer
 private:
 	unsigned int VBO;
 	unsigned int VAO;
+
 	unsigned int _basicShaderProgram;
 	unsigned int _flipbookShaderProgram;
+	unsigned int _lineShaderProgram;
 
 	std::string ReadShader(std::string path);
+
+	unsigned int _testVBO;
+	unsigned int _testVAO;
 
 public:
 	class Camera
@@ -36,6 +42,7 @@ public:
 
 	void Draw(Sprite sprite, float deltaTime);
 	void Draw(SpriteAnimated sprite, float deltaTime);
+	void DrawGizmo(PhysicsBody body, glm::vec3 colour);
 
 private:
 	void ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat);

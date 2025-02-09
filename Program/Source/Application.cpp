@@ -14,6 +14,17 @@
 Application::Application(const std::string& name, uint32_t width, uint32_t height)
 {
 	m_Window = new Window(name, width, height);
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(m_Window->m_NativeWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+	ImGui_ImplOpenGL3_Init();
 }
 
 Application::~Application()
@@ -33,7 +44,7 @@ void Application::Run()
 
 	b2Vec2 gravity;
 	gravity.x = 0.0f;
-	gravity.y = 0.0f;
+	gravity.y = -10.0f;
 	worldDef.gravity = gravity;
 
 	b2WorldId worldId = b2CreateWorld(&worldDef);
@@ -53,10 +64,21 @@ void Application::Run()
 	PhysicsBody playerPhysics = PhysicsBody(
 		worldId, 
 		b2_dynamicBody, 
-		glm::vec2(0.0f));
+		glm::vec2(0.0f),
+		1.0f,
+		1.0f);
 
 	// Creating the player controller.
 	Player player = Player(playerSprite, playerPhysics);
+
+	// Creating floor.
+	PhysicsBody floorPhysics = PhysicsBody(
+		worldId,
+		b2_staticBody,
+		glm::vec2(0.0f),
+		100.0f,
+		0.4f);
+	floorPhysics.SetPosition(glm::vec2(0.0f, -10.0f));
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -70,6 +92,10 @@ void Application::Run()
 	float timer = 0;
 	while (!m_Window->ShouldClose())
 	{
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - previousTime;
 
@@ -86,8 +112,28 @@ void Application::Run()
 
 		player.Update(deltaTime, m_Window);
 		renderer.Draw(*player.GetAnimatedSprite(), deltaTime);
+
+		if (_drawPhysicsColliders) {
+			renderer.DrawGizmo(player.GetPhysicsBody(), glm::vec3(0.0f, 1.0f, 0.0f));
+			renderer.DrawGizmo(floorPhysics, glm::vec3(0.95f, 0.44f, 0.91f));
+		}
 		
 		m_Window->ProcessEvents();
+
+		if (ImGui::Button("Reset player")) {
+			b2Rot resetRot = b2Rot();
+			resetRot.c = 0;
+			resetRot.s = 1;
+			b2Body_SetLinearVelocity(player.GetBodyId(), b2Vec2_zero);
+			b2Body_SetTransform(player.GetBodyId(), b2Vec2_zero, resetRot);
+		}
+
+		if (ImGui::RadioButton("Physics colliders", _drawPhysicsColliders)) {
+			_drawPhysicsColliders = !_drawPhysicsColliders;
+		}
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		m_Window->SwapBuffers();
 

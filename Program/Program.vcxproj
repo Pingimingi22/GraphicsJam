@@ -58,7 +58,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include;$(SolutionDir)ThirdParty\GLM;$(SolutionDir)ThirdParty\GLAD\include;$(SolutionDir)ThirdParty\STB;$(SolutionDir)ThirdParty\Box2D\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include;$(SolutionDir)ThirdParty\GLM;$(SolutionDir)ThirdParty\GLAD\include;$(SolutionDir)ThirdParty\STB;$(SolutionDir)ThirdParty\Box2D\include;C:\Users\danie\Downloads\OpenGLBase-master\OpenGLBase-master\ThirdParty\ImGUI\imgui\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -83,7 +83,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include;$(SolutionDir)ThirdParty\GLM;$(SolutionDir)ThirdParty\GLAD\include;$(SolutionDir)ThirdParty\STB;$(SolutionDir)ThirdParty\Box2D\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include;$(SolutionDir)ThirdParty\GLM;$(SolutionDir)ThirdParty\GLAD\include;$(SolutionDir)ThirdParty\STB;$(SolutionDir)ThirdParty\Box2D\include;C:\Users\danie\Downloads\OpenGLBase-master\OpenGLBase-master\ThirdParty\ImGUI\imgui\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -103,6 +103,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_draw.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_tables.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_widgets.cpp" />
     <ClCompile Include="Source\PhysicsBody.cpp" />
     <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />

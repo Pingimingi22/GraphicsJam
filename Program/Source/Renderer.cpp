@@ -17,6 +17,17 @@ static float _quadVertices[] =
 	-0.5f, -0.5f,  0.0f,	0.0f, 0.0f, // bottom left
 };
 
+static float _outlineShape[] =
+{
+	-0.5f, -0.5f,  0.0f,
+	-0.5f,  0.5f,  0.0f,
+	0.5f,  0.5f,  0.0f,
+
+	0.5f,  0.5f,  0.0f,
+	0.5f, -0.5f,  0.0f,
+	-0.5f, -0.5f,  0.0f,
+};
+
 std::string Renderer::ReadShader(std::string path)
 {
 	std::string fullFile;
@@ -45,7 +56,6 @@ void Renderer::Init(const Window& window)
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(_quadVertices), _quadVertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -54,8 +64,19 @@ void Renderer::Init(const Window& window)
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	// ---------------------------- Testing line drawing gizmo stuff
+	glGenVertexArrays(1, &_testVAO);
+	glBindVertexArray(_testVAO);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(_quadVertices), _quadVertices, GL_STATIC_DRAW);
+	glGenBuffers(1, &_testVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _testVBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(_quadVertices), _outlineShape, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// -------------------------------
 
 	// Vertex shader ---------------------------------
 
@@ -75,6 +96,17 @@ void Renderer::Init(const Window& window)
 		unsigned int flipbookShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
 
 		_flipbookShaderProgram = flipbookShaderProgram;
+
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+	}
+
+	{
+		unsigned int vertexShader = CreateVertexShader("vertexShader.vsh");
+		unsigned int fragmentShader = CreateFragmentShader("line.fsh");
+		unsigned int lineShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
+
+		_lineShaderProgram = lineShaderProgram;
 
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
@@ -102,6 +134,43 @@ void Renderer::Draw(Sprite sprite, float deltaTime)
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
+{
+	b2Vec2 bodyPos = b2Body_GetPosition(body.GetId());
+	
+	b2AABB aabb = b2Shape_GetAABB(body.GetShapeId());
+
+	b2Vec2 aabbCentre = b2AABB_Center(aabb);
+	b2Vec2 aabbsExtents = b2AABB_Extents(aabb);
+
+	glm::vec3 topLeft;
+	glm::vec3 topRight;
+	glm::vec3 bottomLeft;
+	glm::vec3 bottomRight;
+
+	glm::mat4 modelMat =
+		glm::translate(
+			glm::mat4(1.0f),
+			glm::vec3(aabbCentre.x, aabbCentre.y, 0.0f)) *
+		glm::scale(
+			glm::mat4(1.0f),
+			glm::vec3(aabbsExtents.x*2, aabbsExtents.y*2, 1.0f));
+
+	ConfigureShader(
+		_lineShaderProgram,
+		-1,
+		modelMat);
+
+	glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"), 
+									 colour.x, colour.y, colour.z);
+
+	glBindVertexArray(_testVAO);
+
+	glLineWidth(2.0f);
+	
+	glDrawArrays(GL_LINE_LOOP, 0, 6);
 }
 
 unsigned int Renderer::CreateVertexShader(std::string path)
@@ -182,7 +251,9 @@ void Renderer::ConfigureShader(unsigned int shaderProgram, unsigned int texture,
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "viewMat"), 1, GL_FALSE, &camera.GetViewMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, &camera.projectionMatrix[0][0]);
 
-	glBindTexture(GL_TEXTURE_2D, texture);
+	if (texture != -1) {
+		glBindTexture(GL_TEXTURE_2D, texture);
+	}
 }
 
 void Renderer::Draw(SpriteAnimated sprite, float deltaTime)

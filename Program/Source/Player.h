@@ -18,8 +18,13 @@ public:
 	PhysicsBody GetPhysicsBody();
 	b2BodyId GetBodyId();
 
+	float _moveSpeed = 5.0f;
+	float _jumpStrength = 50.0f;
+
 private:
 	Sprite* _sprite = nullptr;
 	PhysicsBody _physics;
+
+	bool _isJumping = false;
 };
 

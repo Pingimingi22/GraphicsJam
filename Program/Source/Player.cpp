@@ -22,34 +22,35 @@ void Player::Update(float deltaTime, Window* window)
 
 void Player::HandleInput(float deltaTime, Window* window)
 {
-	b2Vec2 force = b2Vec2();
-
-	if (glfwGetKey(window->m_NativeWindow, GLFW_KEY_W) == GLFW_PRESS) {
-		force.y += 5;
-	}
-	if (glfwGetKey(window->m_NativeWindow, GLFW_KEY_S) == GLFW_PRESS) {
-		force.y -= 5;
-	}
+	float horizontalInput = 0;
+	float verticalInput = 0;
 	if (glfwGetKey(window->m_NativeWindow, GLFW_KEY_D) == GLFW_PRESS) {
-		force.x += 5;
+		horizontalInput = 1;
 	}
 	if (glfwGetKey(window->m_NativeWindow, GLFW_KEY_A) == GLFW_PRESS) {
-		force.x -= 5;
+		horizontalInput = -1;
+	}
+	if (glfwGetKey(window->m_NativeWindow, GLFW_KEY_SPACE) == GLFW_PRESS &&
+		!_isJumping) {
+		verticalInput = 1;
+		_isJumping = true;
 	}
 
-	if (force.x < 0) {
+	// Flip sprite based on input.
+	if (horizontalInput < 0) {
 		GetSprite()->SetScale(glm::vec2(-20, 20));
 	}
-	else if (force.x > 0) {
+	else if (horizontalInput > 0) {
 		GetSprite()->SetScale(glm::vec2(20, 20));
 	}
 
+	// Animate through flipbook shader.
 	GetAnimatedSprite()->animationTimer += deltaTime;
 	if (GetAnimatedSprite()->animationTimer >= 0.1f) {
 		GetAnimatedSprite()->animationTimer = 0;
 
 		SpriteAnimated* animatedSprite = GetAnimatedSprite();
-		if (force.x != 0)
+		if (horizontalInput != 0)
 		{
 			int newIndex = animatedSprite->GetCurrentFrameIndex() + 1;
 			animatedSprite->SetCurrentFrameIndex(newIndex);
@@ -59,12 +60,32 @@ void Player::HandleInput(float deltaTime, Window* window)
 		}
 	}
 
+	glm::vec2 up = glm::vec2(0.0f, 1.0f);
+	glm::vec2 right = glm::vec2(1.0f, 0.0f);
+	glm::vec2 desiredVelocity = glm::vec2(right * horizontalInput) * _moveSpeed;
+
+	b2Vec2 currentVelocity = b2Body_GetLinearVelocity(GetBodyId());
+	glm::vec2 currentVelocityGlm = glm::vec2(currentVelocity.x, currentVelocity.y);
+
+	glm::vec2 requiredForce = (desiredVelocity - currentVelocityGlm);
+	
+	b2Vec2 requiredForceB2D = b2Vec2();
+	requiredForceB2D.x = requiredForce.x;
+	requiredForceB2D.y = 0;
+
 	b2Vec2 forcePoint = b2Vec2_zero;
-	b2Body_ApplyForce(
-		GetBodyId(),
-		force,
-		forcePoint,
-		true);
+
+	b2Vec2 jumpForce = b2Vec2();
+	jumpForce.y = (up * _jumpStrength * verticalInput).y;
+	b2Body_ApplyLinearImpulse(GetBodyId(), requiredForceB2D + jumpForce, forcePoint, true);
+
+	b2ContactEvents contactEvents = b2World_GetContactEvents(GetPhysicsBody().GetWorldId());
+	for (int i = 0; i < contactEvents.beginCount; ++i)
+	{
+		b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + i;
+		std::cout << "Collision detected!" << std::endl;
+		_isJumping = false;
+	}
 }
 
 Sprite* Player::GetSprite()
