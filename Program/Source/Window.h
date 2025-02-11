@@ -22,6 +22,8 @@ public:
 	uint32_t Height() const;
 
 	GLFWwindow* m_NativeWindow;
+
+	static Window* Instance;
 private:
 	uint32_t m_Width, m_Height;
 	std::string m_Title;

@@ -3,6 +3,7 @@
 #include <fstream>
 #include "box2d/types.h"
 
+Renderer* Renderer::Instance = nullptr;
 
 static float _quadVertices[] =
 {
@@ -51,6 +52,8 @@ std::string Renderer::ReadShader(std::string path)
 
 void Renderer::Init(const Window& window)
 {
+	Instance = this;
+
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
@@ -339,4 +342,8 @@ glm::mat4 Renderer::Camera::GetViewMatrix()
 
 	glm::mat4 cameraToWorld = translationMat;
 	return glm::inverse(cameraToWorld);
+}
+
+void Renderer::SetCameraPos(float x, float y) {
+	camera.position = glm::vec3(x, y, camera.position.z);
 }

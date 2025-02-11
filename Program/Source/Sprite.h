@@ -15,7 +15,8 @@ private:
 
 public:
 	Sprite(std::string texturePath,
-		   glm::vec3 position);
+		   glm::vec3 position,
+		   glm::vec2 scale = glm::vec2(1.0f));
 
 	GLuint GetTextureId();
 

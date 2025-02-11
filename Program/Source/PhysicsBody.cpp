@@ -31,6 +31,11 @@ PhysicsBody::PhysicsBody(
 	_worldId = world;
 
 	_shapeId = b2CreatePolygonShape(_bodyId, &shapeDef, &dynamicBox);
+
+	b2Rot resetRot = b2Rot();
+	resetRot.c = 0;
+	resetRot.s = 1;
+	b2Body_SetTransform(_bodyId, bodyPosition, resetRot);
 }
 PhysicsBody::PhysicsBody(
 	b2WorldId world,

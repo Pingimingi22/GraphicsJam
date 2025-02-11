@@ -11,8 +11,14 @@
 #include "PhysicsBody.h"
 #include "Player.h"
 
+Application* Application::Instance = nullptr;
+
 Application::Application(const std::string& name, uint32_t width, uint32_t height)
 {
+	if (Instance == nullptr) {
+		Instance = this;
+	}
+
 	m_Window = new Window(name, width, height);
 
 	// Setup Dear ImGui context
@@ -47,10 +53,11 @@ void Application::Run()
 	gravity.y = -10.0f;
 	worldDef.gravity = gravity;
 
-	b2WorldId worldId = b2CreateWorld(&worldDef);
+	WorldId = b2CreateWorld(&worldDef);
 
 	World world = World();
-	world.Init(worldId);
+	//world.Init(worldId);
+	world.CreateWorldFromImage("world.png");
 	
 	double previousTime = glfwGetTime();
 
@@ -62,10 +69,9 @@ void Application::Run()
 
 	// Creating player physics.
 	PhysicsBody playerPhysics = PhysicsBody(
-		worldId, 
+		WorldId,
 		b2_dynamicBody, 
-		glm::vec2(0.0f),
-		1.0f,
+		glm::vec2(0.0f, 10.0f),
 		1.0f);
 
 	// Creating the player controller.
@@ -73,15 +79,15 @@ void Application::Run()
 
 	// Creating floor.
 	PhysicsBody floorPhysics = PhysicsBody(
-		worldId,
+		WorldId,
 		b2_staticBody,
-		glm::vec2(0.0f),
-		100.0f,
-		0.4f);
-	floorPhysics.SetPosition(glm::vec2(0.0f, -10.0f));
+		glm::vec2(0.0f, 5.0f),
+		1.0f,
+		100.0f);
+	//floorPhysics.SetPosition(glm::vec2(0.0f, -10.0f));
 
 	PhysicsBody randomCircle = PhysicsBody(
-		worldId,
+		WorldId,
 		b2_dynamicBody,
 		glm::vec2(0.0f, 10.0f),
 		5.0f);
@@ -105,15 +111,15 @@ void Application::Run()
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - previousTime;
 
-		b2World_Step(worldId, timeStep, subStepCount);
+		b2World_Step(WorldId, timeStep, subStepCount);
 		
 		// This function should *ideally* not exist in the window class and would
 		// be better suited within a Renderer or Surface class. However, for the
 		// purposes of this base project, it is fine as a temporary solution.
 		m_Window->Clear(0.15f, 0.15f, 0.15f);
 
-		for (int i = 0; i < world.sprites.size(); i++) {
-			renderer.Draw(world.sprites[i], deltaTime);
+		for (int i = 0; i < world.tiles.size(); i++) {
+			renderer.Draw(world.tiles[i].sprite, deltaTime);
 		}
 
 		player.Update(deltaTime, m_Window);
@@ -122,6 +128,10 @@ void Application::Run()
 		if (_drawPhysicsColliders) {
 			renderer.DrawGizmo(player.GetPhysicsBody(), glm::vec3(0.0f, 1.0f, 0.0f));
 			renderer.DrawGizmo(floorPhysics, glm::vec3(0.95f, 0.44f, 0.91f));
+
+			for (int i = 0; i < world.tiles.size(); i++) {
+				renderer.DrawGizmo(world.tiles[i].physics, glm::vec3(0.57f, 0.92f, 0.88f));
+			}
 		}
 
 		renderer.DrawGizmo(randomCircle, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -129,11 +139,14 @@ void Application::Run()
 		m_Window->ProcessEvents();
 
 		if (ImGui::Button("Reset player")) {
+			b2Vec2 newPlayerPos = b2Vec2();
+			newPlayerPos.x = 0;
+			newPlayerPos.y = 15.0f;
 			b2Rot resetRot = b2Rot();
 			resetRot.c = 0;
 			resetRot.s = 1;
 			b2Body_SetLinearVelocity(player.GetBodyId(), b2Vec2_zero);
-			b2Body_SetTransform(player.GetBodyId(), b2Vec2_zero, resetRot);
+			b2Body_SetTransform(player.GetBodyId(), newPlayerPos, resetRot);
 		}
 
 		if (ImGui::RadioButton("Physics colliders", _drawPhysicsColliders)) {

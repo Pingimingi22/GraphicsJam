@@ -1,9 +1,10 @@
 #include "Sprite.h"
 
-Sprite::Sprite(std::string texturePath, glm::vec3 position)
+Sprite::Sprite(std::string texturePath, glm::vec3 position, glm::vec2 scale /*= glm::vec2(1.0f)*/)
 {
 	_position = position;
 	rotation = 0.0f;
+	SetScale(scale);
 
 	int width, height, nrChannels;
 
@@ -25,6 +26,8 @@ Sprite::Sprite(std::string texturePath, glm::vec3 position)
 	}
 	stbi_image_free(data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+
 }
 
 GLuint Sprite::GetTextureId()

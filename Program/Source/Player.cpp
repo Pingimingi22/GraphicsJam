@@ -1,5 +1,5 @@
 #include "Player.h"
-
+#include "Renderer.h"
 
 Player::Player(Sprite* sprite, PhysicsBody physicsBody)
 	: _sprite(sprite), _physics(physicsBody) {
@@ -18,6 +18,7 @@ void Player::Update(float deltaTime, Window* window)
 
 	glm::vec2 physicsPosition = _physics.GetPosition();
 	_sprite->SetPosition(physicsPosition);
+	Renderer::Instance->SetCameraPos(physicsPosition.x, physicsPosition.y);
 }
 
 void Player::HandleInput(float deltaTime, Window* window)

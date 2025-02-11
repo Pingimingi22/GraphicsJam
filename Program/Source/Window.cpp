@@ -9,6 +9,8 @@
 
 static bool s_GLFWInitialised = false;
 
+Window* Window::Instance = nullptr;
+
 static void Log(const std::string& description)
 {
 	std::cout << description << std::endl;
@@ -34,6 +36,10 @@ static void GPUInfoDump()
 Window::Window(const std::string& title, uint32_t width, uint32_t height)
 	: m_Title(title), m_Width(width), m_Height(height)
 {
+	if (Instance == nullptr) {
+		Instance = this;
+	}
+
 	// Initialise glfw
 	s_GLFWInitialised = glfwInit();
 

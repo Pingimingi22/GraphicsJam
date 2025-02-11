@@ -11,7 +11,6 @@
 
 class Renderer
 {
-
 private:
 	unsigned int VBO;
 	unsigned int VAO;
@@ -29,6 +28,8 @@ private:
 	unsigned int _circleRenderVAO;
 
 public:
+	static Renderer* Instance;
+
 	class Camera
 	{
 	public:
@@ -47,6 +48,7 @@ public:
 	void Draw(Sprite sprite, float deltaTime);
 	void Draw(SpriteAnimated sprite, float deltaTime);
 	void DrawGizmo(PhysicsBody body, glm::vec3 colour);
+	void SetCameraPos(float x, float y);
 
 private:
 	void ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat);

@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "box2d/box2d.h"
 
 class Application
 {
@@ -11,6 +12,10 @@ public:
 	~Application();
 
 	void Run();
+
+	b2WorldId WorldId;
+
+	static Application* Instance;
 
 private:
 	Window* m_Window;
