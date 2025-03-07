@@ -18,6 +18,7 @@ private:
 	unsigned int _basicShaderProgram;
 	unsigned int _flipbookShaderProgram;
 	unsigned int _lineShaderProgram;
+	unsigned int _pointToPointLineShaderProgram;
 
 	std::string ReadShader(std::string path);
 
@@ -26,6 +27,9 @@ private:
 
 	unsigned int _circleRenderVBO;
 	unsigned int _circleRenderVAO;
+
+	unsigned int _pointToPointRenderVBO;
+	unsigned int _pointToPointRenderVAO;
 
 public:
 	static Renderer* Instance;
@@ -52,6 +56,7 @@ public:
 
 private:
 	void ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat);
+	void ConfigureShader(unsigned int shaderProgram, unsigned int texture);
 
 	unsigned int CreateVertexShader(std::string path);
 	unsigned int CreateFragmentShader(std::string path);

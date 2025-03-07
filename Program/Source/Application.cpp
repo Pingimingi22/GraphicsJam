@@ -71,7 +71,7 @@ void Application::Run()
 	PhysicsBody playerPhysics = PhysicsBody(
 		WorldId,
 		b2_dynamicBody, 
-		glm::vec2(0.0f, 10.0f),
+		glm::vec2(20.0f, 17.0f),
 		1.0f);
 
 	// Creating the player controller.
@@ -89,8 +89,21 @@ void Application::Run()
 	PhysicsBody randomCircle = PhysicsBody(
 		WorldId,
 		b2_dynamicBody,
-		glm::vec2(0.0f, 10.0f),
+		glm::vec2(10.0f, 17.0f),
 		5.0f);
+
+	PhysicsBody randomCircle2 = PhysicsBody(
+		WorldId,
+		b2_dynamicBody,
+		glm::vec2(20.0f, 17.0f),
+		2.0f);
+
+	PhysicsBody randomCircle3 = PhysicsBody(
+		WorldId,
+		b2_dynamicBody,
+		glm::vec2(30.0f, 17.0f),
+		2.0f);
+	
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -125,17 +138,24 @@ void Application::Run()
 		player.Update(deltaTime, m_Window);
 		renderer.Draw(*player.GetAnimatedSprite(), deltaTime);
 
-		if (_drawPhysicsColliders) {
+	
+		if (_drawPlayerColliders) {
 			renderer.DrawGizmo(player.GetPhysicsBody(), glm::vec3(0.0f, 1.0f, 0.0f));
+		}
+
+		if (_drawWorldColliders) {
 			renderer.DrawGizmo(floorPhysics, glm::vec3(0.95f, 0.44f, 0.91f));
 
 			for (int i = 0; i < world.tiles.size(); i++) {
 				renderer.DrawGizmo(world.tiles[i].physics, glm::vec3(0.57f, 0.92f, 0.88f));
 			}
 		}
+		
 
 		renderer.DrawGizmo(randomCircle, glm::vec3(1.0f, 0.0f, 0.0f));
-		
+		renderer.DrawGizmo(randomCircle2, glm::vec3(1.0f, 0.0f, 0.0f));
+		renderer.DrawGizmo(randomCircle3, glm::vec3(1.0f, 0.0f, 0.0f));
+
 		m_Window->ProcessEvents();
 
 		if (ImGui::Button("Reset player")) {
@@ -149,9 +169,24 @@ void Application::Run()
 			b2Body_SetTransform(player.GetBodyId(), newPlayerPos, resetRot);
 		}
 
-		if (ImGui::RadioButton("Physics colliders", _drawPhysicsColliders)) {
-			_drawPhysicsColliders = !_drawPhysicsColliders;
+		ImGui::SeparatorText("Collider settings");
+
+		ImGui::BeginGroup();
+		if (ImGui::RadioButton("Player collider", _drawPlayerColliders)) {
+			_drawPlayerColliders = !_drawPlayerColliders;
 		}
+		if (ImGui::RadioButton("World colliders", _drawWorldColliders)) {
+			_drawWorldColliders = !_drawWorldColliders;
+		}
+		ImGui::EndGroup();
+
+		if (ImGui::Button("Create joint")) {
+			randomCircle.JoinObject(playerPhysics, 10);
+		}
+		if (ImGui::Button("Create joint 2")) {
+			randomCircle2.JoinObject(randomCircle3, 10);
+		}
+		
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

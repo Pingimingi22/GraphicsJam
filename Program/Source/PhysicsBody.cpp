@@ -25,7 +25,7 @@ PhysicsBody::PhysicsBody(
 
 	shapeDef.enableContactEvents = true;
 	shapeDef.density = 1.0f;
-	shapeDef.friction = 0.0f;
+	shapeDef.friction = 0.3f;
 
 	_bodyId = b2CreateBody(world, &bodyDef);
 	_worldId = world;
@@ -52,7 +52,7 @@ PhysicsBody::PhysicsBody(
 	bodyDef.position = bodyPosition;
 
 	// Freeze rotation
-	bodyDef.fixedRotation = true;
+	bodyDef.fixedRotation = false;
 
 	b2Circle dynamicCircle;
 	dynamicCircle.radius = radius;
@@ -62,7 +62,7 @@ PhysicsBody::PhysicsBody(
 
 	shapeDef.enableContactEvents = true;
 	shapeDef.density = 1.0f;
-	shapeDef.friction = 0.0f;
+	shapeDef.friction = 1.0f;
 
 	_bodyId = b2CreateBody(world, &bodyDef);
 	_worldId = world;
@@ -94,6 +94,20 @@ void PhysicsBody::SetPosition(glm::vec2 position)
 	newRot.c = 1;
 	newRot.s = 0;
 	b2Body_SetTransform(_bodyId, newPos, newRot);
+}
+
+void PhysicsBody::JoinObject(PhysicsBody otherBody, float jointLength)
+{
+	b2DistanceJointDef jointDef = b2DefaultDistanceJointDef();
+	jointDef.bodyIdA = _bodyId;
+	jointDef.bodyIdB = otherBody._bodyId;
+	jointDef.length = jointLength;
+	jointDef.localAnchorA = {0.0f, 0.0f};
+	jointDef.localAnchorB = { 0.0f, 0.0f };
+	jointDef.maxLength = jointLength;
+	jointDef.minLength = 0;
+	
+	_joints.push_back(b2CreateDistanceJoint(_worldId, &jointDef));
 }
 
 glm::vec2 PhysicsBody::GetPosition()

@@ -19,5 +19,8 @@ public:
 
 private:
 	Window* m_Window;
+
 	bool _drawPhysicsColliders = false;
+	bool _drawPlayerColliders = false;
+	bool _drawWorldColliders = false;
 };

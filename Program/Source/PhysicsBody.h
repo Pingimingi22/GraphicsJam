@@ -27,8 +27,13 @@ public:
 	
 	void SetPosition(glm::vec2 position);
 
+	void JoinObject(PhysicsBody otherBody, float jointLength);
+
 	glm::vec2 GetLinearVelocity();
 	glm::vec2 GetPosition();
+
+	std::vector<b2JointId> _joints;
+	bool HasJoints() { return _joints.size() > 0; }
 
 private:
 	b2BodyId _bodyId;

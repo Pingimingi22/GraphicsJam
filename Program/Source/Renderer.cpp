@@ -84,10 +84,14 @@ void Renderer::Init(const Window& window)
 
 	// ------------------------------- Testing creating circle verts
 
+	int numberOfEdges = 8;
 	glm::vec4 unitVec = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-	for (int i = 0; i < 360; i++) {
+	for (int i = 0; i < numberOfEdges; i++) {
+
+		float degreesBetweenPoint = 360.0f / numberOfEdges;
 		float toRadians = 3.14159265f / 180;
-		glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), (float)i * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), (float)i * degreesBetweenPoint * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
 		glm::vec3 newPoint = rotate * unitVec;
 		_unitCircleVerts.push_back(newPoint);
 	}
@@ -103,6 +107,22 @@ void Renderer::Init(const Window& window)
 	glEnableVertexAttribArray(0);
 
 	// -------------------------------
+
+
+	// --------------------------- Test creating point to point line
+	
+	glGenVertexArrays(1, &_pointToPointRenderVAO);
+	glBindVertexArray(_pointToPointRenderVAO);
+
+	glGenBuffers(1, &_pointToPointRenderVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _pointToPointRenderVBO);
+
+	//glBufferData(GL_ARRAY_BUFFER, 100*2 * sizeof(glm::vec3), nullptr, GL_DYNAMIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// ---------------------------
 
 	// Vertex shader ---------------------------------
 
@@ -138,6 +158,17 @@ void Renderer::Init(const Window& window)
 		glDeleteShader(fragmentShader);
 	}
 
+	{
+		unsigned int vertexShader = CreateVertexShader("pointToPointLine.vsh");
+		unsigned int fragmentShader = CreateFragmentShader("pointToPointLine.fsh");
+		unsigned int pointToPointLineShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
+
+		_pointToPointLineShaderProgram = pointToPointLineShaderProgram;
+
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+	}
+
 
 	// ------------------------
 
@@ -167,10 +198,55 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 	b2Vec2 bodyPos = b2Body_GetPosition(body.GetId());
 	b2ShapeType shapeType = b2Shape_GetType(body.GetShapeId());
 
+	if (body.HasJoints()) {
+		b2JointId allJoints[5];
+
+		int numberOfJoints = b2Body_GetJoints(body.GetId(), allJoints, 5);
+
+		std::vector<glm::vec3> linePoints = std::vector<glm::vec3>();
+		for (int i = 0; i < numberOfJoints; i++) {
+			b2BodyId bodyA = b2Joint_GetBodyA(allJoints[i]);
+			b2BodyId bodyB = b2Joint_GetBodyB(allJoints[i]);
+			b2Vec2 bodyAPos = b2Body_GetPosition(bodyA);
+			b2Vec2 bodyBPos = b2Body_GetPosition(bodyB);
+			glm::vec3 bodyAPosGLM = glm::vec3(bodyAPos.x, bodyAPos.y, 0);
+			glm::vec3 bodyBPosGLM = glm::vec3(bodyBPos.x, bodyBPos.y, 0);
+
+			linePoints.push_back(bodyAPosGLM);
+			linePoints.push_back(bodyBPosGLM);
+			//linePoints.push_back(UINT16_MAX)
+		}
+
+		ConfigureShader(
+			_pointToPointLineShaderProgram,
+			-1);
+
+		glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"),
+			1, 1, 1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, _pointToPointRenderVBO);
+		glBufferData(GL_ARRAY_BUFFER, linePoints.size() * sizeof(float) * 3, linePoints.data(), GL_STATIC_DRAW);
+		//glBufferSubData(GL_ARRAY_BUFFER, 0, linePoints.size() * sizeof(glm::vec3), linePoints.data());
+		glEnableVertexAttribArray(0);
+
+		glBindVertexArray(_pointToPointRenderVAO);
+
+
+		glLineWidth(2.5f);
+		glDrawArrays(GL_LINES, 0, linePoints.size());
+	}
+
+
 	if (shapeType == b2_circleShape) {
 		b2Circle circle = b2Shape_GetCircle(body.GetShapeId());
 		b2Vec2 circleCentre = b2Body_GetPosition(body.GetId());
 		float circleRadius = circle.radius;
+		b2Rot circleRotation = b2Body_GetRotation(body.GetId());
+
+		glm::vec2 rotationVec = glm::vec2(circleRotation.c, circleRotation.s);
+		float calculatedRotation = atan2(rotationVec.y, rotationVec.x);
+		std::cout << "Calculated rotation: " << calculatedRotation << '\n';
+
 
 		glm::vec3 topLeft;
 		glm::vec3 topRight;
@@ -183,7 +259,11 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 				glm::vec3(circleCentre.x, circleCentre.y, 0.0f)) *
 			glm::scale(
 				glm::mat4(1.0f),
-				glm::vec3(circleRadius, circleRadius, 1.0f));
+				glm::vec3(circleRadius, circleRadius, 1.0f)) *
+			glm::rotate(
+				glm::mat4(1.0f), 
+				calculatedRotation,
+				glm::vec3(0.0, 0.0, 1.0f));
 
 		ConfigureShader(
 			_lineShaderProgram,
@@ -307,6 +387,19 @@ void Renderer::ConfigureShader(unsigned int shaderProgram, unsigned int texture,
 
 	// Apply uniforms.
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMat"), 1, GL_FALSE, &modelMat[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "viewMat"), 1, GL_FALSE, &camera.GetViewMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, &camera.projectionMatrix[0][0]);
+
+	if (texture != -1) {
+		glBindTexture(GL_TEXTURE_2D, texture);
+	}
+}
+
+void Renderer::ConfigureShader(unsigned int shaderProgram, unsigned int texture)
+{
+	glUseProgram(shaderProgram);
+
+	// Apply uniforms.
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "viewMat"), 1, GL_FALSE, &camera.GetViewMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, &camera.projectionMatrix[0][0]);
 
