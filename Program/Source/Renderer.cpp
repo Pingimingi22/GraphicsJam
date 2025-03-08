@@ -245,7 +245,6 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 
 		glm::vec2 rotationVec = glm::vec2(circleRotation.c, circleRotation.s);
 		float calculatedRotation = atan2(rotationVec.y, rotationVec.x);
-		std::cout << "Calculated rotation: " << calculatedRotation << '\n';
 
 
 		glm::vec3 topLeft;
@@ -283,18 +282,27 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 		b2Vec2 aabbCentre = b2AABB_Center(aabb);
 		b2Vec2 aabbsExtents = b2AABB_Extents(aabb);
 
-		glm::vec3 topLeft;
-		glm::vec3 topRight;
-		glm::vec3 bottomLeft;
-		glm::vec3 bottomRight;
+		b2Rot aabbRotation = b2Body_GetRotation(body.GetId());
+
+		glm::vec2 rotationVec = glm::vec2(aabbRotation.c, aabbRotation.s);
+		float calculatedRotation = atan2(rotationVec.y, rotationVec.x);
 
 		glm::mat4 modelMat =
 			glm::translate(
 				glm::mat4(1.0f),
 				glm::vec3(aabbCentre.x, aabbCentre.y, 0.0f)) *
+			glm::rotate(
+				glm::mat4(1.0f), 
+				calculatedRotation, 
+				glm::vec3(0, 0, 1)) * 
 			glm::scale(
 				glm::mat4(1.0f),
-				glm::vec3(aabbsExtents.x * 2, aabbsExtents.y * 2, 1.0f));
+				glm::vec3(body.halfWidth*2, body.halfHeight*2, 1.0f));
+
+		glm::vec4 testPos = glm::vec4(0, 0, 0, 1);
+		glm::vec3 positionWorldSpace = modelMat * testPos;
+		glm::vec3 positionOfEdgeWorldSpace = positionWorldSpace + glm::vec3(1, 0, 0) * aabbsExtents.x;
+
 
 		ConfigureShader(
 			_lineShaderProgram,

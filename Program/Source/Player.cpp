@@ -1,5 +1,7 @@
 #include "Player.h"
 #include "Renderer.h"
+#include "imgui.h"
+#include <string>
 
 Player::Player(Sprite* sprite, PhysicsBody physicsBody)
 	: _sprite(sprite), _physics(physicsBody) {
@@ -35,6 +37,7 @@ void Player::HandleInput(float deltaTime, Window* window)
 		!_isJumping) {
 		verticalInput = 1;
 		_isJumping = true;
+		std::cout << "Jumping!!!" << std::endl;
 	}
 
 	// Flip sprite based on input.
@@ -80,13 +83,24 @@ void Player::HandleInput(float deltaTime, Window* window)
 	jumpForce.y = (up * _jumpStrength * verticalInput).y;
 	b2Body_ApplyLinearImpulse(GetBodyId(), requiredForceB2D + jumpForce, forcePoint, true);
 
+
+	glm::vec2 currentPosGlm = _physics.GetPosition();
+	b2Vec2 currentPos = { currentPosGlm.x, currentPosGlm.y };
+	b2QueryFilter filter = b2DefaultQueryFilter();
+
+	b2RayResult castResult = b2World_CastRayClosest(_physics.GetWorldId(), currentPos, { 0.0, -0.99f }, filter);
+	if (castResult.hit && jumpForce.y <= 0) {
+		_isJumping = false;
+	}
+
+	/*
 	b2ContactEvents contactEvents = b2World_GetContactEvents(GetPhysicsBody().GetWorldId());
 	for (int i = 0; i < contactEvents.beginCount; ++i)
 	{
 		b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + i;
 		std::cout << "Collision detected!" << std::endl;
 		_isJumping = false;
-	}
+	}*/
 }
 
 Sprite* Player::GetSprite()
@@ -107,4 +121,32 @@ PhysicsBody Player::GetPhysicsBody()
 b2BodyId Player::GetBodyId()
 {
 	return GetPhysicsBody().GetId();
+}
+
+void Player::ShowTooltip()
+{
+	ImGui::BeginTooltip();
+	ImGui::Text("Player");
+	ImGui::EndTooltip();
+}
+
+void Player::ShowUI()
+{
+	ImGui::Begin("Player");
+	ImGui::Text(std::string("Is Jumping: " + std::to_string(_isJumping)).c_str());
+	ImGui::End();
+}
+
+bool Player::IsPointOverlapping(glm::vec2 point)
+{
+	b2Circle circle = b2Shape_GetCircle(_physics.GetShapeId());
+	glm::vec2 position = _physics.GetPosition();
+
+    glm::vec3 pointInCircleSpace = glm::vec3(point.x, point.y, 0);
+	glm::mat4 circleLocalToWorld = glm::translate(glm::mat4(1), { position.x, position.y, 0 });
+	glm::mat4 circleWorldToLocal = glm::inverse(circleLocalToWorld);
+	
+	pointInCircleSpace = circleWorldToLocal * glm::vec4(point.x, point.y, 0, 1);
+
+	return b2PointInCircle({ pointInCircleSpace.x, pointInCircleSpace.y}, &circle);
 }

@@ -3,8 +3,9 @@
 #include "PhysicsBody.h"
 #include "GLFW/glfw3.h"
 #include "Window.h"
+#include "GameObject.h"
 
-class Player
+class Player : public GameObject
 {
 public:
 	Player(Sprite* sprite, PhysicsBody physicsBody);
@@ -20,6 +21,10 @@ public:
 
 	float _moveSpeed = 5.0f;
 	float _jumpStrength = 50.0f;
+
+	void ShowTooltip() override;
+	void ShowUI() override;
+	bool IsPointOverlapping(glm::vec2 point) override;
 
 private:
 	Sprite* _sprite = nullptr;

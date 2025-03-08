@@ -10,6 +10,8 @@
 #include "box2d/box2d.h"
 #include "PhysicsBody.h"
 #include "Player.h"
+#include "InputManager.h"
+#include "PhysicsProp.h"
 
 Application* Application::Instance = nullptr;
 
@@ -45,6 +47,7 @@ void Application::Run()
 
 	Renderer renderer = Renderer();
 	renderer.Init(*m_Window);
+	InputManager inputManager = InputManager(m_Window);
 	
 	b2WorldDef worldDef = b2DefaultWorldDef();
 
@@ -103,6 +106,17 @@ void Application::Run()
 		b2_dynamicBody,
 		glm::vec2(30.0f, 17.0f),
 		2.0f);
+
+	PhysicsProp circle1 = PhysicsProp("circle 1", &randomCircle);
+	PhysicsProp circle2 = PhysicsProp("circle 2", &randomCircle2);
+	PhysicsProp circle3 = PhysicsProp("circle 3", &randomCircle3);
+
+	std::vector<GameObject*> gameObjects = std::vector<GameObject*>();
+	gameObjects.push_back(&player);
+	gameObjects.push_back(&circle1);
+	gameObjects.push_back(&circle2);
+	gameObjects.push_back(&circle3);
+	inputManager.SetDetectableGameObjects(&gameObjects);
 	
 
 	glEnable(GL_BLEND);
@@ -151,10 +165,9 @@ void Application::Run()
 			}
 		}
 		
-
-		renderer.DrawGizmo(randomCircle, glm::vec3(1.0f, 0.0f, 0.0f));
-		renderer.DrawGizmo(randomCircle2, glm::vec3(1.0f, 0.0f, 0.0f));
-		renderer.DrawGizmo(randomCircle3, glm::vec3(1.0f, 0.0f, 0.0f));
+		for (int i = 0; i < gameObjects.size(); i++) {
+			gameObjects[i]->Draw();
+		}
 
 		m_Window->ProcessEvents();
 
@@ -187,6 +200,29 @@ void Application::Run()
 			randomCircle2.JoinObject(randomCircle3, 10);
 		}
 		
+		inputManager.Update();
+
+		ImGui::SeparatorText("Camera");
+
+		std::string cameraPositionString = std::to_string(Renderer::Instance->camera.position.x) + ", " +
+			std::to_string(Renderer::Instance->camera.position.y) + ", " +
+			std::to_string(Renderer::Instance->camera.position.z);
+		ImGui::Text(std::string("Camera position " + cameraPositionString).c_str());
+
+
+		if (ImGui::IsMouseClicked(1)) {
+			ImGui::OpenPopup("ContextMenu");
+		}
+
+		if (ImGui::BeginPopupContextItem("ContextMenu")) {
+			if (ImGui::MenuItem("Spawn circle")) {
+				SpawnCircle(inputManager.GetMouseWorldPoint(), 2.0f, &gameObjects);
+			}
+			if (ImGui::MenuItem("Spawn rectangle")) {
+				SpawnRectangle(inputManager.GetMouseWorldPoint(), 2.0f, 2.0f, &gameObjects);
+			}
+			ImGui::EndPopup();
+		}
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -195,4 +231,31 @@ void Application::Run()
 
 		previousTime = currentTime;
 	}
+}
+
+void Application::SpawnCircle(glm::vec2 position, float radius, std::vector<GameObject*>* gameObjects)
+{
+	PhysicsBody* newCircleBody = new PhysicsBody(
+		WorldId,
+		b2_dynamicBody,
+		position,
+		radius);
+
+	PhysicsProp* newCircle = new PhysicsProp(std::string("new circle " + std::to_string(gameObjects->size())), newCircleBody);
+
+	gameObjects->push_back(newCircle);
+}
+
+void Application::SpawnRectangle(glm::vec2 position, float width, float height, std::vector<GameObject*>* gameObjects)
+{
+	PhysicsBody* newRectangleBody = new PhysicsBody(
+		WorldId,
+		b2_dynamicBody,
+		position, 
+		width,
+		height);
+
+	PhysicsProp* newRectangle = new PhysicsProp(std::string("new rectangle " + std::to_string(gameObjects->size())), newRectangleBody);
+
+	gameObjects->push_back(newRectangle);
 }

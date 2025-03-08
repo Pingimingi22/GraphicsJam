@@ -16,10 +16,10 @@ PhysicsBody::PhysicsBody(
 	bodyDef.position = bodyPosition;
 
 	// Freeze rotation
-	bodyDef.fixedRotation = true;
+	bodyDef.fixedRotation = false;
 
 	// Test shapes. Will change later.
-	b2Polygon dynamicBox = b2MakeRoundedBox(halfWidth, halfHeight, 0.25f);
+	b2Polygon dynamicBox = b2MakeRoundedBox(halfWidth, halfHeight, 0.0f);
 
 	b2ShapeDef shapeDef = b2DefaultShapeDef();
 
@@ -36,6 +36,11 @@ PhysicsBody::PhysicsBody(
 	resetRot.c = 0;
 	resetRot.s = 1;
 	b2Body_SetTransform(_bodyId, bodyPosition, resetRot);
+
+	shapeType = b2ShapeType::b2_polygonShape;
+
+	this->halfWidth = halfWidth;
+	this->halfHeight = halfHeight;
 }
 PhysicsBody::PhysicsBody(
 	b2WorldId world,
@@ -68,6 +73,8 @@ PhysicsBody::PhysicsBody(
 	_worldId = world;
 
 	_shapeId = b2CreateCircleShape(_bodyId, &shapeDef, &dynamicCircle);
+
+	shapeType = b2ShapeType::b2_circleShape;
 }
 
 b2BodyId PhysicsBody::GetId()

@@ -109,7 +109,10 @@
     <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_tables.cpp" />
     <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_widgets.cpp" />
+    <ClCompile Include="Source\GameObject.cpp" />
+    <ClCompile Include="Source\InputManager.cpp" />
     <ClCompile Include="Source\PhysicsBody.cpp" />
+    <ClCompile Include="Source\PhysicsProp.cpp" />
     <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\Application.cpp" />
@@ -120,7 +123,10 @@
     <ClCompile Include="Source\SpriteAnimated.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\GameObject.h" />
+    <ClInclude Include="Source\InputManager.h" />
     <ClInclude Include="Source\PhysicsBody.h" />
+    <ClInclude Include="Source\PhysicsProp.h" />
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Application.h" />

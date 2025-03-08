@@ -18,6 +18,8 @@ public:
 		glm::vec2 initialPos,
 		float radius);
 
+	b2ShapeType shapeType;
+
 	b2BodyId GetId();
 	b2ShapeId GetShapeId();
 	b2WorldId GetWorldId();
@@ -34,6 +36,9 @@ public:
 
 	std::vector<b2JointId> _joints;
 	bool HasJoints() { return _joints.size() > 0; }
+
+	float halfWidth;
+	float halfHeight;
 
 private:
 	b2BodyId _bodyId;
