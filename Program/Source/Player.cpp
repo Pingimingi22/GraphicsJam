@@ -88,10 +88,29 @@ void Player::HandleInput(float deltaTime, Window* window)
 	b2Vec2 currentPos = { currentPosGlm.x, currentPosGlm.y };
 	b2QueryFilter filter = b2DefaultQueryFilter();
 
-	b2RayResult castResult = b2World_CastRayClosest(_physics.GetWorldId(), currentPos, { 0.0, -0.99f }, filter);
-	if (castResult.hit && jumpForce.y <= 0) {
-		_isJumping = false;
-	}
+	b2Circle circleShapeCast = b2Circle();
+	circleShapeCast.radius = 0.1f;
+	b2Transform playerTransform = b2Body_GetTransform(_physics.GetId());
+
+	struct idk {
+		b2Vec2 jumpForce;
+		bool* isJumping;
+	} testStruct ;
+	testStruct.jumpForce = jumpForce;
+	testStruct.isJumping = &_isJumping;
+
+	auto castCallback = [](b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context) {
+		idk* theStructReturns = (idk*)context;
+
+		if (theStructReturns->jumpForce.y <= 0) {
+			*(theStructReturns->isJumping) = false;
+		}
+	
+		// Will return closest hit.
+		return fraction;
+	};
+	b2TreeStats castResult = b2World_CastCircle(_physics.GetWorldId(), &circleShapeCast, playerTransform, { 0.0, -1.0f }, filter, castCallback, &testStruct);
+	
 
 	/*
 	b2ContactEvents contactEvents = b2World_GetContactEvents(GetPhysicsBody().GetWorldId());

@@ -75,7 +75,8 @@ void Application::Run()
 		WorldId,
 		b2_dynamicBody, 
 		glm::vec2(20.0f, 17.0f),
-		1.0f);
+		1.0f,
+		true);
 
 	// Creating the player controller.
 	Player player = Player(playerSprite, playerPhysics);
@@ -85,27 +86,31 @@ void Application::Run()
 		WorldId,
 		b2_staticBody,
 		glm::vec2(0.0f, 5.0f),
+		100.0f,
 		1.0f,
-		100.0f);
+		true);
 	//floorPhysics.SetPosition(glm::vec2(0.0f, -10.0f));
 
 	PhysicsBody randomCircle = PhysicsBody(
 		WorldId,
 		b2_dynamicBody,
 		glm::vec2(10.0f, 17.0f),
-		5.0f);
+		5.0f,
+		false);
 
 	PhysicsBody randomCircle2 = PhysicsBody(
 		WorldId,
 		b2_dynamicBody,
 		glm::vec2(20.0f, 17.0f),
-		2.0f);
+		2.0f,
+		false);
 
 	PhysicsBody randomCircle3 = PhysicsBody(
 		WorldId,
 		b2_dynamicBody,
 		glm::vec2(30.0f, 17.0f),
-		2.0f);
+		2.0f,
+		false);
 
 	PhysicsProp circle1 = PhysicsProp("circle 1", &randomCircle);
 	PhysicsProp circle2 = PhysicsProp("circle 2", &randomCircle2);
@@ -239,7 +244,8 @@ void Application::SpawnCircle(glm::vec2 position, float radius, std::vector<Game
 		WorldId,
 		b2_dynamicBody,
 		position,
-		radius);
+		radius,
+		false);
 
 	PhysicsProp* newCircle = new PhysicsProp(std::string("new circle " + std::to_string(gameObjects->size())), newCircleBody);
 
@@ -253,7 +259,8 @@ void Application::SpawnRectangle(glm::vec2 position, float width, float height, 
 		b2_dynamicBody,
 		position, 
 		width,
-		height);
+		height,
+		false);
 
 	PhysicsProp* newRectangle = new PhysicsProp(std::string("new rectangle " + std::to_string(gameObjects->size())), newRectangleBody);
 

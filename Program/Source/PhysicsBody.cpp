@@ -5,7 +5,8 @@ PhysicsBody::PhysicsBody(
 	b2BodyType type,
 	glm::vec2 initialPos,
 	float halfWidth,
-	float halfHeight)
+	float halfHeight,
+	bool freezeRotation)
 {
 	b2BodyDef bodyDef = b2DefaultBodyDef();
 	bodyDef.type = type;
@@ -16,37 +17,19 @@ PhysicsBody::PhysicsBody(
 	bodyDef.position = bodyPosition;
 
 	// Freeze rotation
-	bodyDef.fixedRotation = false;
-
-	// Test shapes. Will change later.
-	b2Polygon dynamicBox = b2MakeRoundedBox(halfWidth, halfHeight, 0.0f);
-
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-
-	shapeDef.enableContactEvents = true;
-	shapeDef.density = 1.0f;
-	shapeDef.friction = 0.3f;
+	bodyDef.fixedRotation = freezeRotation;
 
 	_bodyId = b2CreateBody(world, &bodyDef);
+	CreateSquareShape(halfWidth, halfHeight);
 	_worldId = world;
 
-	_shapeId = b2CreatePolygonShape(_bodyId, &shapeDef, &dynamicBox);
-
-	b2Rot resetRot = b2Rot();
-	resetRot.c = 0;
-	resetRot.s = 1;
-	b2Body_SetTransform(_bodyId, bodyPosition, resetRot);
-
-	shapeType = b2ShapeType::b2_polygonShape;
-
-	this->halfWidth = halfWidth;
-	this->halfHeight = halfHeight;
 }
 PhysicsBody::PhysicsBody(
 	b2WorldId world,
 	b2BodyType type,
 	glm::vec2 initialPos,
-	float radius)
+	float radius,
+	bool freezeRotation)
 {
 	b2BodyDef bodyDef = b2DefaultBodyDef();
 	bodyDef.type = type;
@@ -57,24 +40,11 @@ PhysicsBody::PhysicsBody(
 	bodyDef.position = bodyPosition;
 
 	// Freeze rotation
-	bodyDef.fixedRotation = false;
-
-	b2Circle dynamicCircle;
-	dynamicCircle.radius = radius;
-	dynamicCircle.center = b2Vec2_zero;
-
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-
-	shapeDef.enableContactEvents = true;
-	shapeDef.density = 1.0f;
-	shapeDef.friction = 1.0f;
+	bodyDef.fixedRotation = freezeRotation;
 
 	_bodyId = b2CreateBody(world, &bodyDef);
+	CreateCircleShape(radius);
 	_worldId = world;
-
-	_shapeId = b2CreateCircleShape(_bodyId, &shapeDef, &dynamicCircle);
-
-	shapeType = b2ShapeType::b2_circleShape;
 }
 
 b2BodyId PhysicsBody::GetId()
@@ -122,4 +92,40 @@ glm::vec2 PhysicsBody::GetPosition()
 	b2Vec2 physicsPos = b2Body_GetPosition(_bodyId);
 	glm::vec2 glmPos = glm::vec2(physicsPos.x, physicsPos.y);
 	return glmPos;
+}
+
+void PhysicsBody::CreateSquareShape(float halfWidth, float halfHeight)
+{
+	// Test shapes. Will change later.
+	b2Polygon dynamicBox = b2MakeRoundedBox(halfWidth, halfHeight, 0.0f);
+
+	b2ShapeDef shapeDef = b2DefaultShapeDef();
+
+	shapeDef.enableContactEvents = true;
+	shapeDef.density = 1.0f;
+	shapeDef.friction = 0.3f;
+
+	_shapeId = b2CreatePolygonShape(_bodyId, &shapeDef, &dynamicBox);
+
+	shapeType = b2ShapeType::b2_polygonShape;
+
+	this->halfWidth = halfWidth;
+	this->halfHeight = halfHeight;
+}
+
+void PhysicsBody::CreateCircleShape(float radius)
+{
+	b2Circle dynamicCircle;
+	dynamicCircle.radius = radius;
+	dynamicCircle.center = b2Vec2_zero;
+
+	b2ShapeDef shapeDef = b2DefaultShapeDef();
+
+	shapeDef.enableContactEvents = true;
+	shapeDef.density = 1.0f;
+	shapeDef.friction = 1.0f;
+
+	_shapeId = b2CreateCircleShape(_bodyId, &shapeDef, &dynamicCircle);
+
+	shapeType = b2ShapeType::b2_circleShape;
 }

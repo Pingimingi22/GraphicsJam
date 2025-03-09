@@ -108,7 +108,8 @@ void World::CreateTile(TileType tile, int x, int y)
 		b2_staticBody,
 		glm::vec2(x * tileScale, y * tileScale),
 		1.0f,
-		1.0f);
+		1.0f,
+		true);
 	Sprite sprite = Sprite(tileTexturePath, glm::vec3(x * tileScale, y * tileScale, 0), glm::vec3(tileScale, tileScale, 1.0f));
 	tiles.emplace_back(sprite, tilePhysics);
 }

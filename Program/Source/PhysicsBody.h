@@ -6,17 +6,19 @@
 class PhysicsBody
 {
 public:
-	PhysicsBody( 
-		b2WorldId world, 
-		b2BodyType type, 
-		glm::vec2 initialPos,
-		float halfWidth,
-		float halfHeight);
 	PhysicsBody(
 		b2WorldId world,
 		b2BodyType type,
 		glm::vec2 initialPos,
-		float radius);
+		float halfWidth,
+		float halfHeight,
+		bool freezeRotation = false);
+	PhysicsBody(
+		b2WorldId world,
+		b2BodyType type,
+		glm::vec2 initialPos,
+		float radius,
+		bool freezeRotation=false);
 
 	b2ShapeType shapeType;
 
@@ -31,7 +33,6 @@ public:
 
 	void JoinObject(PhysicsBody otherBody, float jointLength);
 
-	glm::vec2 GetLinearVelocity();
 	glm::vec2 GetPosition();
 
 	std::vector<b2JointId> _joints;
@@ -44,5 +45,8 @@ private:
 	b2BodyId _bodyId;
 	b2WorldId _worldId;
 	b2ShapeId _shapeId;
+
+	void CreateSquareShape(float halfWidth, float halfHeight);
+	void CreateCircleShape(float radius);
 };
 
