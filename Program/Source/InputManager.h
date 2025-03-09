@@ -5,16 +5,16 @@
 #include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
 #include "Window.h"
+#include "PhysicsBody.h"
 
 class InputManager {
 private:
-	InputManager* _instance = nullptr;
 	std::vector<GameObject*>* gameObjects = nullptr;
 	Window* window = nullptr;
 
 public:
+	static InputManager* Instance;
 	InputManager(Window* window);
-	InputManager Instance();
 
 	glm::vec2 GetMouseScreenPoint();
 	glm::vec3 GetMouseWorldPoint();
@@ -26,4 +26,6 @@ public:
 	void SetDetectableGameObjects(std::vector<GameObject*>* gameObjects);
 
 	void Update();
+
+	PhysicsBody* BodyJoinedToMouse = nullptr;
 };

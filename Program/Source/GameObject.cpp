@@ -23,3 +23,7 @@ void GameObject::ShowUI()
 void GameObject::Draw()
 {
 }
+
+void GameObject::Update()
+{
+}

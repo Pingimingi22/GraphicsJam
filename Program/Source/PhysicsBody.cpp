@@ -1,4 +1,6 @@
 #include "PhysicsBody.h"
+#include "InputManager.h"
+#include <iostream>
 
 PhysicsBody::PhysicsBody(
 	b2WorldId world, 
@@ -62,6 +64,11 @@ b2WorldId PhysicsBody::GetWorldId()
 	return _worldId;
 }
 
+b2JointId PhysicsBody::GetMouseJointId()
+{
+	return _mouseJointId;
+}
+
 void PhysicsBody::SetPosition(glm::vec2 position)
 {
 	b2Vec2 newPos = b2Vec2();
@@ -85,6 +92,40 @@ void PhysicsBody::JoinObject(PhysicsBody otherBody, float jointLength)
 	jointDef.minLength = 0;
 	
 	_joints.push_back(b2CreateDistanceJoint(_worldId, &jointDef));
+}
+
+void PhysicsBody::JoinObjectToMouse()
+{
+	if (_mouseJointId.index1 == 0) {
+		glm::vec3 mouseWorldPoint = InputManager::Instance->GetMouseWorldPoint();
+
+		b2BodyDef groundBodyDef = b2DefaultBodyDef();
+		groundBodyDef.type = b2_staticBody;
+		//groundBodyDef.position = { mouseWorldPoint.x, mouseWorldPoint.y };
+		b2BodyId groundBody = b2CreateBody(_worldId, &groundBodyDef);
+
+		b2MouseJointDef mouseJoint = b2DefaultMouseJointDef();
+		mouseJoint.bodyIdA = groundBody;
+		mouseJoint.bodyIdB = _bodyId;
+		mouseJoint.maxForce = 5000;
+		mouseJoint.dampingRatio = 10.0f;
+		mouseJoint.hertz = 10.0f;
+
+		mouseJoint.target = { mouseWorldPoint.x, mouseWorldPoint.y };
+
+		_mouseJointId = b2CreateMouseJoint(_worldId, &mouseJoint);
+
+		InputManager::Instance->BodyJoinedToMouse = this;
+	}
+	else {
+		std::cout << "Tried to create mouse joint but joint already exists." << std::endl;
+	}
+}
+
+void PhysicsBody::BreakMouseJoint()
+{
+	b2DestroyJoint(_mouseJointId);
+	_mouseJointId.index1 = 0;
 }
 
 glm::vec2 PhysicsBody::GetPosition()

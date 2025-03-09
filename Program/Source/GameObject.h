@@ -9,4 +9,5 @@ public:
 	virtual void ShowUI();
 
 	virtual void Draw();
+	virtual void Update();
 };

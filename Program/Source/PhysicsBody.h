@@ -25,6 +25,7 @@ public:
 	b2BodyId GetId();
 	b2ShapeId GetShapeId();
 	b2WorldId GetWorldId();
+	b2JointId GetMouseJointId();
 
 	void ApplyForce(glm::vec2 force);
 	void ChangeBodyType(b2BodyType type);
@@ -32,6 +33,8 @@ public:
 	void SetPosition(glm::vec2 position);
 
 	void JoinObject(PhysicsBody otherBody, float jointLength);
+	void JoinObjectToMouse();
+	void BreakMouseJoint();
 
 	glm::vec2 GetPosition();
 	float GetRotation();
@@ -46,6 +49,8 @@ private:
 	b2BodyId _bodyId;
 	b2WorldId _worldId;
 	b2ShapeId _shapeId;
+
+	b2JointId _mouseJointId;
 
 	void CreateSquareShape(float halfWidth, float halfHeight);
 	void CreateCircleShape(float radius);

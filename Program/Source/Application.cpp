@@ -151,6 +151,7 @@ void Application::Run()
 		}
 		
 		for (int i = 0; i < gameObjects.size(); i++) {
+			gameObjects[i]->Update();
 			gameObjects[i]->Draw();
 		}
 

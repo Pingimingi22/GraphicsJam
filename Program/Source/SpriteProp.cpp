@@ -1,6 +1,7 @@
 #include "SpriteProp.h"
 #include "Renderer.h"
 #include "Application.h"
+#include "InputManager.h"
 
 SpriteProp::SpriteProp(std::string objName, 
 	std::string spritePath, 
@@ -28,6 +29,10 @@ void SpriteProp::ShowTooltip()
 	ImGui::BeginTooltip();
 	ImGui::Text(std::string(_name).c_str());
 	ImGui::EndTooltip();
+
+	if (ImGui::IsMouseClicked(0)) {
+		_physics->JoinObjectToMouse();
+	}
 }
 
 bool SpriteProp::IsPointOverlapping(glm::vec2 point)
@@ -61,4 +66,24 @@ void SpriteProp::Draw()
 	_sprite->SetScale(glm::vec2(_physics->halfWidth * 2, _physics->halfHeight * 2));
 	_sprite->SetRotation(rotation);
 	Renderer::Instance->Draw(*_sprite, _isHovered);
+}
+
+void SpriteProp::Update()
+{
+	if (_physics->GetMouseJointId().index1 != 0) {
+		glm::vec3 mouseWorldPos = InputManager::Instance->GetMouseWorldPoint();
+		b2MouseJoint_SetTarget(_physics->GetMouseJointId(), { mouseWorldPos.x, mouseWorldPos.y });
+	}
+
+	ResetMouseJointIfStuck();
+}
+
+void SpriteProp::ResetMouseJointIfStuck()
+{
+	if (_physics->GetMouseJointId().index1 != 0) {
+		b2Vec2 velocity = b2Body_GetLinearVelocity(_physics->GetId());
+		if (b2LengthSquared(velocity) < 0.0001f) {
+			b2Body_ApplyLinearImpulse(_physics->GetId(), { 0.01f, 0.01f }, { 0,0 }, true);
+		}
+	}
 }

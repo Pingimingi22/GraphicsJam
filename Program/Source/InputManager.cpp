@@ -3,9 +3,12 @@
 #include "Renderer.h"
 #include "GLFW/glfw3.h"
 
+InputManager* InputManager::Instance = nullptr;
+
 InputManager::InputManager(Window* window)
 {
 	this->window = window;
+	Instance = this;
 }
 
 glm::vec2 InputManager::GetMouseScreenPoint()
@@ -70,6 +73,13 @@ void InputManager::Update()
 
 		if (objectRef->IsPointOverlapping(GetMouseWorldPoint())) {
 			objectRef->ShowTooltip();
+		}
+	}
+
+	if (BodyJoinedToMouse != nullptr) {
+		if (ImGui::IsMouseReleased(0)) {
+			BodyJoinedToMouse->BreakMouseJoint();
+			BodyJoinedToMouse = nullptr;
 		}
 	}
 

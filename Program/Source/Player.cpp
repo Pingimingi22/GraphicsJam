@@ -89,20 +89,21 @@ void Player::HandleInput(float deltaTime, Window* window)
 	b2QueryFilter filter = b2DefaultQueryFilter();
 
 	b2Circle circleShapeCast = b2Circle();
-	circleShapeCast.radius = 0.1f;
+	circleShapeCast.radius = 0.3f;
 	b2Transform playerTransform = b2Body_GetTransform(_physics.GetId());
 
+	currentVelocity = b2Body_GetLinearVelocity(GetBodyId());
 	struct idk {
-		b2Vec2 jumpForce;
+		b2Vec2 velocity;
 		bool* isJumping;
 	} testStruct ;
-	testStruct.jumpForce = jumpForce;
+	testStruct.velocity = currentVelocity;
 	testStruct.isJumping = &_isJumping;
 
 	auto castCallback = [](b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context) {
 		idk* theStructReturns = (idk*)context;
 
-		if (theStructReturns->jumpForce.y <= 0) {
+		if (theStructReturns->velocity.y <= 0) {
 			*(theStructReturns->isJumping) = false;
 		}
 	
