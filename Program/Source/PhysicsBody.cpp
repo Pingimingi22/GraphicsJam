@@ -107,8 +107,8 @@ void PhysicsBody::JoinObjectToMouse()
 		b2MouseJointDef mouseJoint = b2DefaultMouseJointDef();
 		mouseJoint.bodyIdA = groundBody;
 		mouseJoint.bodyIdB = _bodyId;
-		mouseJoint.maxForce = 5000;
-		mouseJoint.dampingRatio = 10.0f;
+		mouseJoint.maxForce = 10000;
+		mouseJoint.dampingRatio = 5.0f;
 		mouseJoint.hertz = 10.0f;
 
 		mouseJoint.target = { mouseWorldPoint.x, mouseWorldPoint.y };
