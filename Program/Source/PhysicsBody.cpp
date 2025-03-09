@@ -94,6 +94,11 @@ glm::vec2 PhysicsBody::GetPosition()
 	return glmPos;
 }
 
+float PhysicsBody::GetRotation() {
+	b2Rot rotation = b2Body_GetRotation(_bodyId);
+	return atan2(rotation.s, rotation.c);
+}
+
 void PhysicsBody::CreateSquareShape(float halfWidth, float halfHeight)
 {
 	// Test shapes. Will change later.

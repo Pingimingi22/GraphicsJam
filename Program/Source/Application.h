@@ -8,6 +8,7 @@
 #include <vector>
 #include "GameObject.h"
 
+
 class Application
 {
 public:
@@ -16,12 +17,26 @@ public:
 
 	void Run();
 
-	b2WorldId WorldId;
+	//b2WorldId WorldId;
 
 	static Application* Instance;
 
-	void SpawnCircle(glm::vec2 position, float radius, std::vector<GameObject*>* gameObjects);
-	void SpawnRectangle(glm::vec2 position, float width, float height, std::vector<GameObject*>* gameObjects);
+	void SpawnCircle(glm::vec2 position, 
+		float radius, 
+		std::vector<GameObject*>* gameObjects);
+
+	void SpawnRectangle(glm::vec2 position, 
+		float width, 
+		float height, 
+		std::vector<GameObject*>* gameObjects);
+
+	void SpawnSpriteProp(std::string spritePath, 
+		glm::vec2 position, 
+		float width, 
+		float height, 
+		std::vector<GameObject*>* gameObjects);
+
+	b2WorldId WorldId;
 
 private:
 	Window* m_Window;

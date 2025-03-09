@@ -46,6 +46,11 @@ void Sprite::SetPosition(glm::vec2 newPosition)
 	_position.y = newPosition.y;
 }
 
+void Sprite::SetRotation(float newRotation)
+{
+	rotation = newRotation;
+}
+
 void Sprite::SetScale(float uniformScale)
 {
 	_scale.x = uniformScale;
@@ -63,8 +68,8 @@ void Sprite::SetScale(glm::vec2 nonUniformScale)
 glm::mat4 Sprite::ObjToWorld()
 {
 	glm::mat4 modelMat = glm::translate(glm::mat4(1.0f), _position) * 
-						 glm::scale(glm::mat4(1.0f), _scale) * 
-						 glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0.0f, 0.0f, 1.0f));
+						 glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0.0f, 0.0f, 1.0f)) *
+						 glm::scale(glm::mat4(1.0f), _scale);
 	return modelMat;
 }
 

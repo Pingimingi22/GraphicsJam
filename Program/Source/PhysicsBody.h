@@ -34,6 +34,7 @@ public:
 	void JoinObject(PhysicsBody otherBody, float jointLength);
 
 	glm::vec2 GetPosition();
+	float GetRotation();
 
 	std::vector<b2JointId> _joints;
 	bool HasJoints() { return _joints.size() > 0; }

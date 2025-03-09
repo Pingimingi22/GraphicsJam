@@ -12,6 +12,9 @@
 #include "Player.h"
 #include "InputManager.h"
 #include "PhysicsProp.h"
+#include "CircleProp.h"
+#include "RectangleProp.h"
+#include "SpriteProp.h"
 
 Application* Application::Instance = nullptr;
 
@@ -89,38 +92,9 @@ void Application::Run()
 		100.0f,
 		1.0f,
 		true);
-	//floorPhysics.SetPosition(glm::vec2(0.0f, -10.0f));
-
-	PhysicsBody randomCircle = PhysicsBody(
-		WorldId,
-		b2_dynamicBody,
-		glm::vec2(10.0f, 17.0f),
-		5.0f,
-		false);
-
-	PhysicsBody randomCircle2 = PhysicsBody(
-		WorldId,
-		b2_dynamicBody,
-		glm::vec2(20.0f, 17.0f),
-		2.0f,
-		false);
-
-	PhysicsBody randomCircle3 = PhysicsBody(
-		WorldId,
-		b2_dynamicBody,
-		glm::vec2(30.0f, 17.0f),
-		2.0f,
-		false);
-
-	PhysicsProp circle1 = PhysicsProp("circle 1", &randomCircle);
-	PhysicsProp circle2 = PhysicsProp("circle 2", &randomCircle2);
-	PhysicsProp circle3 = PhysicsProp("circle 3", &randomCircle3);
 
 	std::vector<GameObject*> gameObjects = std::vector<GameObject*>();
 	gameObjects.push_back(&player);
-	gameObjects.push_back(&circle1);
-	gameObjects.push_back(&circle2);
-	gameObjects.push_back(&circle3);
 	inputManager.SetDetectableGameObjects(&gameObjects);
 	
 
@@ -198,13 +172,6 @@ void Application::Run()
 		}
 		ImGui::EndGroup();
 
-		if (ImGui::Button("Create joint")) {
-			randomCircle.JoinObject(playerPhysics, 10);
-		}
-		if (ImGui::Button("Create joint 2")) {
-			randomCircle2.JoinObject(randomCircle3, 10);
-		}
-		
 		inputManager.Update();
 
 		ImGui::SeparatorText("Camera");
@@ -224,7 +191,42 @@ void Application::Run()
 				SpawnCircle(inputManager.GetMouseWorldPoint(), 2.0f, &gameObjects);
 			}
 			if (ImGui::MenuItem("Spawn rectangle")) {
-				SpawnRectangle(inputManager.GetMouseWorldPoint(), 2.0f, 2.0f, &gameObjects);
+				SpawnRectangle(inputManager.GetMouseWorldPoint(), 4.0f, 4.0f, &gameObjects);
+			}
+			if (ImGui::MenuItem("Spawn crate")) {
+				SpawnSpriteProp("crate.png", 
+					inputManager.GetMouseWorldPoint(), 
+					4.0f, 
+					4.0f, 
+					&gameObjects);
+			}
+			if (ImGui::MenuItem("Spawn barrel")) {
+				SpawnSpriteProp("barrel.png",
+					inputManager.GetMouseWorldPoint(),
+					2.0f,
+					2.58f,
+					&gameObjects);
+			}
+			if (ImGui::MenuItem("Spawn pumpkin")) {
+				SpawnSpriteProp("pumpkin.png",
+					inputManager.GetMouseWorldPoint(),
+					2.0f,
+					2.58f,
+					&gameObjects);
+			}
+			if (ImGui::MenuItem("Spawn chest")) {
+				SpawnSpriteProp("chest.png",
+					inputManager.GetMouseWorldPoint(),
+					2.0f,
+					2.0f,
+					&gameObjects);
+			}
+			if (ImGui::MenuItem("Spawn ladder")) {
+				SpawnSpriteProp("ladder.png",
+					inputManager.GetMouseWorldPoint(),
+					2.0f,
+					6.0f,
+					&gameObjects);
 			}
 			ImGui::EndPopup();
 		}
@@ -240,29 +242,28 @@ void Application::Run()
 
 void Application::SpawnCircle(glm::vec2 position, float radius, std::vector<GameObject*>* gameObjects)
 {
-	PhysicsBody* newCircleBody = new PhysicsBody(
-		WorldId,
-		b2_dynamicBody,
-		position,
-		radius,
-		false);
-
-	PhysicsProp* newCircle = new PhysicsProp(std::string("new circle " + std::to_string(gameObjects->size())), newCircleBody);
+	CircleProp* newCircle = new CircleProp(std::string("new circle " + std::to_string(gameObjects->size())), 
+		radius, 
+		position);
 
 	gameObjects->push_back(newCircle);
 }
 
 void Application::SpawnRectangle(glm::vec2 position, float width, float height, std::vector<GameObject*>* gameObjects)
 {
-	PhysicsBody* newRectangleBody = new PhysicsBody(
-		WorldId,
-		b2_dynamicBody,
-		position, 
+	RectangleProp* newRectangle = new RectangleProp(std::string("new rectangle " + std::to_string(gameObjects->size())),
 		width,
 		height,
-		false);
-
-	PhysicsProp* newRectangle = new PhysicsProp(std::string("new rectangle " + std::to_string(gameObjects->size())), newRectangleBody);
-
+		position);
 	gameObjects->push_back(newRectangle);
+}
+
+void Application::SpawnSpriteProp(std::string spritePath, glm::vec2 position, float width, float height, std::vector<GameObject*>* gameObjects)
+{
+	SpriteProp* newSpriteProp = new SpriteProp(spritePath,
+		spritePath,
+		width,
+		height,
+		position);
+	gameObjects->push_back(newSpriteProp);
 }

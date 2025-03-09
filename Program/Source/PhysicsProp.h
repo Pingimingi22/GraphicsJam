@@ -5,17 +5,14 @@
 #include "imgui.h"
 
 class PhysicsProp : public GameObject {
-private:
-	PhysicsBody* physics = nullptr;
-	std::string name = "unnamed object";
-
-	bool popupShowing = false;
+protected:
+	PhysicsBody* _physics = nullptr;
+	std::string _name = "unnamed object";
+	bool _popupShowing = false;
 
 public:
-	PhysicsProp(std::string name, PhysicsBody* body);
-
-	void ShowTooltip();
-	bool IsPointOverlapping(glm::vec2 point) override;
-	void ShowUI() override;
-	void Draw() override;
+	virtual void ShowTooltip() = 0;
+	virtual bool IsPointOverlapping(glm::vec2 point) = 0;
+	virtual void ShowUI() = 0;
+	virtual void Draw() = 0;
 };
