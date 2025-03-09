@@ -23,9 +23,10 @@ bool RectangleProp::IsPointOverlapping(glm::vec2 point)
 {
 	b2Polygon aabb = b2Shape_GetPolygon(_physics->GetShapeId());
 	glm::vec2 position = _physics->GetPosition();
+	float rotation = _physics->GetRotation();
 
 	glm::vec3 pointInAABBSpace = glm::vec3(point.x, point.y, 0);
-	glm::mat4 aabbLocalToWorld = glm::translate(glm::mat4(1), { position.x, position.y, 0 });
+	glm::mat4 aabbLocalToWorld = glm::translate(glm::mat4(1), { position.x, position.y, 0 }) * glm::rotate(glm::mat4(1), rotation, glm::vec3(0, 0, 1));
 	glm::mat4 aabbWorldToLocal = glm::inverse(aabbLocalToWorld);
 
 	pointInAABBSpace = aabbWorldToLocal * glm::vec4(point.x, point.y, 0, 1);

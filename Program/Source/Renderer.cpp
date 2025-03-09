@@ -182,12 +182,13 @@ void Renderer::Init(const Window& window)
 	//glUniform1i(glGetUniformLocation(shaderProgram, "ourTexture"), 0);
 }
 
-void Renderer::Draw(Sprite sprite, float deltaTime)
+void Renderer::Draw(Sprite sprite, bool isHighlighted)
 {
 	ConfigureShader(
 		_basicShaderProgram, 
 		sprite.GetTextureId(), 
-		sprite.ObjToWorld());
+		sprite.ObjToWorld(),
+		isHighlighted);
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -410,6 +411,22 @@ void Renderer::ConfigureShader(unsigned int shaderProgram, unsigned int texture)
 	// Apply uniforms.
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "viewMat"), 1, GL_FALSE, &camera.GetViewMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, &camera.projectionMatrix[0][0]);
+
+	if (texture != -1) {
+		glBindTexture(GL_TEXTURE_2D, texture);
+	}
+}
+
+void Renderer::ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat, bool isHighlighted)
+{
+	glUseProgram(shaderProgram);
+
+	// Apply uniforms.
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMat"), 1, GL_FALSE, &modelMat[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "viewMat"), 1, GL_FALSE, &camera.GetViewMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, &camera.projectionMatrix[0][0]);
+
+	glUniform1i(glGetUniformLocation(shaderProgram, "isHighlighted"), isHighlighted);
 
 	if (texture != -1) {
 		glBindTexture(GL_TEXTURE_2D, texture);

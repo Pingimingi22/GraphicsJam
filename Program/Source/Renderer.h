@@ -49,13 +49,14 @@ public:
 
 	void Init(const Window& window);
 
-	void Draw(Sprite sprite, float deltaTime);
+	void Draw(Sprite sprite, bool isHighlighted=false);
 	void Draw(SpriteAnimated sprite, float deltaTime);
 	void DrawGizmo(PhysicsBody body, glm::vec3 colour);
 	void SetCameraPos(float x, float y);
 
 private:
 	void ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat);
+	void ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat, bool isHighlighted);
 	void ConfigureShader(unsigned int shaderProgram, unsigned int texture);
 
 	unsigned int CreateVertexShader(std::string path);

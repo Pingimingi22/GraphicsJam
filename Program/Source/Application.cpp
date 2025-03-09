@@ -108,6 +108,11 @@ void Application::Run()
 	int subStepCount = 4;
 
 	float timer = 0;
+
+	glfwSwapInterval(1);
+
+	float accumulator = 0.0f;
+
 	while (!m_Window->ShouldClose())
 	{
 		ImGui_ImplOpenGL3_NewFrame();
@@ -119,13 +124,14 @@ void Application::Run()
 
 		b2World_Step(WorldId, timeStep, subStepCount);
 		
+		
 		// This function should *ideally* not exist in the window class and would
 		// be better suited within a Renderer or Surface class. However, for the
 		// purposes of this base project, it is fine as a temporary solution.
 		m_Window->Clear(0.15f, 0.15f, 0.15f);
 
 		for (int i = 0; i < world.tiles.size(); i++) {
-			renderer.Draw(world.tiles[i].sprite, deltaTime);
+			renderer.Draw(world.tiles[i].sprite);
 		}
 
 		player.Update(deltaTime, m_Window);
@@ -184,46 +190,57 @@ void Application::Run()
 
 		if (ImGui::IsMouseClicked(1)) {
 			ImGui::OpenPopup("ContextMenu");
+			_mouseContextWorldPosition = inputManager.GetMouseWorldPoint();
 		}
 
+		glm::vec2 spawnPosition = _mouseContextWorldPosition;
 		if (ImGui::BeginPopupContextItem("ContextMenu")) {
+			if (ImGui::MenuItem("Explode point")) {
+				b2ExplosionDef explosion = b2DefaultExplosionDef();
+				explosion.position = { spawnPosition.x, spawnPosition.y };
+				explosion.radius = 8.0f;
+				explosion.falloff = 25.0f;
+				explosion.impulsePerLength = 40.0f;
+				
+				b2World_Explode(WorldId, &explosion);
+			}
 			if (ImGui::MenuItem("Spawn circle")) {
-				SpawnCircle(inputManager.GetMouseWorldPoint(), 2.0f, &gameObjects);
+				SpawnCircle(spawnPosition, 2.0f, &gameObjects);
 			}
 			if (ImGui::MenuItem("Spawn rectangle")) {
-				SpawnRectangle(inputManager.GetMouseWorldPoint(), 4.0f, 4.0f, &gameObjects);
+				SpawnRectangle(spawnPosition, 4.0f, 4.0f, &gameObjects);
 			}
 			if (ImGui::MenuItem("Spawn crate")) {
 				SpawnSpriteProp("crate.png", 
-					inputManager.GetMouseWorldPoint(), 
+					spawnPosition,
 					4.0f, 
 					4.0f, 
 					&gameObjects);
 			}
 			if (ImGui::MenuItem("Spawn barrel")) {
 				SpawnSpriteProp("barrel.png",
-					inputManager.GetMouseWorldPoint(),
+					spawnPosition,
 					2.0f,
 					2.58f,
 					&gameObjects);
 			}
 			if (ImGui::MenuItem("Spawn pumpkin")) {
 				SpawnSpriteProp("pumpkin.png",
-					inputManager.GetMouseWorldPoint(),
+					spawnPosition,
 					2.0f,
 					2.58f,
 					&gameObjects);
 			}
 			if (ImGui::MenuItem("Spawn chest")) {
 				SpawnSpriteProp("chest.png",
-					inputManager.GetMouseWorldPoint(),
+					spawnPosition,
 					2.0f,
 					2.0f,
 					&gameObjects);
 			}
 			if (ImGui::MenuItem("Spawn ladder")) {
 				SpawnSpriteProp("ladder.png",
-					inputManager.GetMouseWorldPoint(),
+					spawnPosition,
 					2.0f,
 					6.0f,
 					&gameObjects);

@@ -7,6 +7,8 @@ class SpriteProp : public PhysicsProp {
 protected:
 	Sprite* _sprite;
 
+	bool _isHovered = false;
+
 public:
 	SpriteProp(std::string objName,
 		std::string spriteName, 

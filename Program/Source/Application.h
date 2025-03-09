@@ -44,4 +44,9 @@ private:
 	bool _drawPhysicsColliders = false;
 	bool _drawPlayerColliders = false;
 	bool _drawWorldColliders = false;
+
+	/// <summary>
+	/// World space position of the mouse when the right click context menu was opened.
+	/// </summary>
+	glm::vec2 _mouseContextWorldPosition = glm::vec2(0, 0);
 };
