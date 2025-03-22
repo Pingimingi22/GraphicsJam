@@ -143,6 +143,19 @@ b2BodyId Player::GetBodyId()
 	return GetPhysicsBody().GetId();
 }
 
+glm::vec2 Player::GetPosition()
+{
+	return _physics.GetPosition();
+}
+
+glm::vec2 Player::GetDirection()
+{
+	glm::vec2 mouseWorldPoint = InputManager::Instance->GetMouseWorldPoint();
+	glm::vec2 direction = GetPosition() - 
+		mouseWorldPoint;
+	return glm::normalize(direction);
+}
+
 void Player::ShowTooltip()
 {
 	ImGui::BeginTooltip();

@@ -1,6 +1,8 @@
 #include "PhysicsBody.h"
 #include "InputManager.h"
 #include <iostream>
+#include "glm/ext/matrix_transform.hpp"
+#include "Renderer.h"
 
 PhysicsBody::PhysicsBody(
 	b2WorldId world, 
@@ -138,6 +140,71 @@ glm::vec2 PhysicsBody::GetPosition()
 float PhysicsBody::GetRotation() {
 	b2Rot rotation = b2Body_GetRotation(_bodyId);
 	return atan2(rotation.s, rotation.c);
+}
+
+std::vector<b2Vec2> PhysicsBody::GetVerticesFacingPosition(b2Vec2 position)
+{
+	b2Polygon polygon = b2Shape_GetPolygon(_shapeId);
+	
+	std::vector<b2Vec2> verticesFacingPosition = std::vector<b2Vec2>();
+
+	glm::mat4 localToWorld =
+		glm::translate(glm::mat4(1), { GetPosition().x, GetPosition().y, 0}) *
+		glm::rotate(glm::mat4(1), GetRotation(), glm::vec3(0, 0, 1));
+	glm::vec4 centroidWorldSpace = localToWorld * glm::vec4(polygon.centroid.x, polygon.centroid.y, 0, 1);
+	
+	glm::vec4 centroidToPositionWorldSpace =
+		glm::vec4(position.x, position.y, 0, 1) -
+		glm::vec4(centroidWorldSpace.x, centroidWorldSpace.y, 0, 1);
+	centroidToPositionWorldSpace = glm::normalize(centroidToPositionWorldSpace);
+	
+	b2RayCastInput testRay;
+	testRay.origin = { centroidWorldSpace.x, centroidWorldSpace.y };
+	testRay.translation = { centroidToPositionWorldSpace.x*10, centroidToPositionWorldSpace.y*10 };
+	Renderer::Instance->DrawRay(testRay, glm::vec3(1, 1, 1), 3.5f);
+
+	// Looping though count-1 since we're getting edges rather than vertices.
+	for (int i = 0; i < polygon.count; i++) {
+		glm::vec4 edgeNormalWorldSpace = localToWorld * 
+			glm::vec4(polygon.normals[i].x, polygon.normals[i].y, 0, 0);
+		//edgeNormalWorldSpace = glm::normalize(edgeNormalWorldSpace);
+		
+		b2RayCastInput testRay;
+		testRay.origin = { centroidWorldSpace.x, centroidWorldSpace.y };
+		testRay.translation = { edgeNormalWorldSpace.x * 10, edgeNormalWorldSpace.y * 10 };
+		Renderer::Instance->DrawRay(testRay, glm::vec3(0.5, 0.5, 1));
+
+		float dotValue = glm::dot(centroidToPositionWorldSpace, edgeNormalWorldSpace);
+		if (dotValue > 0) {
+			b2Vec2 edgeVertex1;
+			b2Vec2 edgeVertex2;
+			
+			glm::vec4 glmEdgeVertex1 = localToWorld * glm::vec4(
+				polygon.vertices[i].x,
+				polygon.vertices[i].y, 0, 1);
+
+			glm::vec4 glmEdgeVertex2;
+			if (i != 3) {
+				glmEdgeVertex2 = localToWorld * glm::vec4(
+					polygon.vertices[i + 1].x,
+					polygon.vertices[i + 1].y, 0, 1);
+			}
+			else {
+				glmEdgeVertex2 = localToWorld * glm::vec4(
+					polygon.vertices[0].x,
+					polygon.vertices[0].y, 0, 1);
+			}
+			
+
+			edgeVertex1 = { glmEdgeVertex1.x, glmEdgeVertex1.y };
+			edgeVertex2 = { glmEdgeVertex2.x, glmEdgeVertex2.y };
+
+			verticesFacingPosition.push_back(edgeVertex1);
+			verticesFacingPosition.push_back(edgeVertex2);
+		}
+	}
+
+	return verticesFacingPosition;
 }
 
 void PhysicsBody::CreateSquareShape(float halfWidth, float halfHeight)

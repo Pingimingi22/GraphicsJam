@@ -7,6 +7,7 @@
 #include "glm/vec2.hpp"
 #include <vector>
 #include "GameObject.h"
+#include "PhysicsProp.h"
 
 
 class Application
@@ -49,4 +50,6 @@ private:
 	/// World space position of the mouse when the right click context menu was opened.
 	/// </summary>
 	glm::vec2 _mouseContextWorldPosition = glm::vec2(0, 0);
+
+	PhysicsProp* _debugProp;
 };

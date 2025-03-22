@@ -52,6 +52,7 @@ public:
 	void Draw(Sprite sprite, bool isHighlighted=false);
 	void Draw(SpriteAnimated sprite, float deltaTime);
 	void DrawGizmo(PhysicsBody body, glm::vec3 colour);
+	void DrawRay(b2RayCastInput ray, glm::vec3 colour, float lineWidth=2.5f);
 	void SetCameraPos(float x, float y);
 
 private:

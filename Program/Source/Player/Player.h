@@ -4,6 +4,7 @@
 #include "GLFW/glfw3.h"
 #include "Window.h"
 #include "GameObject.h"
+#include "InputManager.h"
 
 class Player : public GameObject
 {
@@ -18,6 +19,9 @@ public:
 	SpriteAnimated* GetAnimatedSprite();
 	PhysicsBody GetPhysicsBody();
 	b2BodyId GetBodyId();
+
+	glm::vec2 GetPosition() override;
+	glm::vec2 GetDirection();
 
 	float _moveSpeed = 5.0f;
 	float _jumpStrength = 50.0f;

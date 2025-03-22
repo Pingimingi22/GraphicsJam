@@ -58,7 +58,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include;$(SolutionDir)ThirdParty\GLM;$(SolutionDir)ThirdParty\GLAD\include;$(SolutionDir)ThirdParty\STB;$(SolutionDir)ThirdParty\Box2D\include;C:\Users\danie\Downloads\OpenGLBase-master\OpenGLBase-master\ThirdParty\ImGUI\imgui\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include;$(SolutionDir)ThirdParty\GLM;$(SolutionDir)ThirdParty\GLAD\include;$(SolutionDir)ThirdParty\STB;$(SolutionDir)ThirdParty\Box2D\include;C:\Users\danie\Downloads\OpenGLBase-master\OpenGLBase-master\ThirdParty\ImGUI\imgui\include;$(SolutionDir)\Program\Source\Player\;$(SolutionDir)\Program\Source\Props\;$(SolutionDir)\Program\Source\World\;$(SolutionDir)\Program\Source\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -83,7 +83,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include;$(SolutionDir)ThirdParty\GLM;$(SolutionDir)ThirdParty\GLAD\include;$(SolutionDir)ThirdParty\STB;$(SolutionDir)ThirdParty\Box2D\include;C:\Users\danie\Downloads\OpenGLBase-master\OpenGLBase-master\ThirdParty\ImGUI\imgui\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\GLFW\include;$(SolutionDir)ThirdParty\GLM;$(SolutionDir)ThirdParty\GLAD\include;$(SolutionDir)ThirdParty\STB;$(SolutionDir)ThirdParty\Box2D\include;C:\Users\danie\Downloads\OpenGLBase-master\OpenGLBase-master\ThirdParty\ImGUI\imgui\include;$(SolutionDir)\Program\Source\Player\;$(SolutionDir)\Program\Source\Props\;$(SolutionDir)\Program\Source\World\;$(SolutionDir)\Program\Source\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -109,37 +109,37 @@
     <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_tables.cpp" />
     <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_widgets.cpp" />
-    <ClCompile Include="Source\CircleProp.cpp" />
+    <ClCompile Include="Source\Props\CircleProp.cpp" />
     <ClCompile Include="Source\GameObject.cpp" />
     <ClCompile Include="Source\InputManager.cpp" />
     <ClCompile Include="Source\PhysicsBody.cpp" />
-    <ClCompile Include="Source\PhysicsProp.cpp" />
-    <ClCompile Include="Source\Player.cpp" />
-    <ClCompile Include="Source\RectangleProp.cpp" />
+    <ClCompile Include="Source\Props\PhysicsProp.cpp" />
+    <ClCompile Include="Source\Player\Player.cpp" />
+    <ClCompile Include="Source\Props\RectangleProp.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\EntryPoint.cpp" />
-    <ClCompile Include="Source\SpriteProp.cpp" />
+    <ClCompile Include="Source\Props\SpriteProp.cpp" />
     <ClCompile Include="Source\Window.cpp" />
     <ClCompile Include="Source\Sprite.cpp" />
-    <ClCompile Include="Source\World.cpp" />
-    <ClCompile Include="Source\SpriteAnimated.cpp" />
+    <ClCompile Include="Source\World\World.cpp" />
+    <ClCompile Include="Source\Player\SpriteAnimated.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\CircleProp.h" />
+    <ClInclude Include="Source\Props\CircleProp.h" />
     <ClInclude Include="Source\GameObject.h" />
     <ClInclude Include="Source\InputManager.h" />
     <ClInclude Include="Source\PhysicsBody.h" />
-    <ClInclude Include="Source\PhysicsProp.h" />
-    <ClInclude Include="Source\Player.h" />
-    <ClInclude Include="Source\RectangleProp.h" />
+    <ClInclude Include="Source\Props\PhysicsProp.h" />
+    <ClInclude Include="Source\Player\Player.h" />
+    <ClInclude Include="Source\Props\RectangleProp.h" />
     <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\SpriteProp.h" />
+    <ClInclude Include="Source\Props\SpriteProp.h" />
     <ClInclude Include="Source\Window.h" />
     <ClInclude Include="Source\Sprite.h" />
-    <ClInclude Include="Source\World.h" />
-    <ClInclude Include="Source\SpriteAnimated.h" />
+    <ClInclude Include="Source\World\World.h" />
+    <ClInclude Include="Source\Player\SpriteAnimated.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -82,7 +82,7 @@ void Application::Run()
 		true);
 
 	// Creating the player controller.
-	Player player = Player(playerSprite, playerPhysics);
+	Player* player = new Player(playerSprite, playerPhysics);
 
 	// Creating floor.
 	PhysicsBody floorPhysics = PhysicsBody(
@@ -94,7 +94,7 @@ void Application::Run()
 		true);
 
 	std::vector<GameObject*> gameObjects = std::vector<GameObject*>();
-	gameObjects.push_back(&player);
+	gameObjects.push_back(player);
 	inputManager.SetDetectableGameObjects(&gameObjects);
 	
 
@@ -134,12 +134,14 @@ void Application::Run()
 			renderer.Draw(world.tiles[i].sprite);
 		}
 
-		player.Update(deltaTime, m_Window);
-		renderer.Draw(*player.GetAnimatedSprite(), deltaTime);
+		player->Update(deltaTime, m_Window);
+		renderer.Draw(*player->GetAnimatedSprite(), deltaTime);
+
+		
 
 	
 		if (_drawPlayerColliders) {
-			renderer.DrawGizmo(player.GetPhysicsBody(), glm::vec3(0.0f, 1.0f, 0.0f));
+			renderer.DrawGizmo(player->GetPhysicsBody(), glm::vec3(0.0f, 1.0f, 0.0f));
 		}
 
 		if (_drawWorldColliders) {
@@ -155,6 +157,20 @@ void Application::Run()
 			gameObjects[i]->Draw();
 		}
 
+		// Hack code to test raycast to closest vertices.
+		// If at least one object has been placed down, we'll use it for our raycast
+		// test.
+		if (_debugProp != nullptr) {
+			b2Vec2 playerPosition = { player->GetPosition().x, player->GetPosition().y };
+			std::vector<b2Vec2> vertices = _debugProp->GetVerticesFacingPosition(playerPosition);
+			for (int i = 0; i < vertices.size(); i++) {
+				b2RayCastInput testRay;
+				testRay.origin = { player->GetPosition().x, player->GetPosition().y };
+				testRay.translation = vertices[i] - testRay.origin;
+				renderer.DrawRay(testRay, glm::vec3(0, 1, 0));
+			}
+		}
+
 		m_Window->ProcessEvents();
 
 		if (ImGui::Button("Reset player")) {
@@ -164,8 +180,8 @@ void Application::Run()
 			b2Rot resetRot = b2Rot();
 			resetRot.c = 0;
 			resetRot.s = 1;
-			b2Body_SetLinearVelocity(player.GetBodyId(), b2Vec2_zero);
-			b2Body_SetTransform(player.GetBodyId(), newPlayerPos, resetRot);
+			b2Body_SetLinearVelocity(player->GetBodyId(), b2Vec2_zero);
+			b2Body_SetTransform(player->GetBodyId(), newPlayerPos, resetRot);
 		}
 
 		ImGui::SeparatorText("Collider settings");
@@ -284,4 +300,6 @@ void Application::SpawnSpriteProp(std::string spritePath, glm::vec2 position, fl
 		height,
 		position);
 	gameObjects->push_back(newSpriteProp);
+
+	_debugProp = newSpriteProp;
 }

@@ -194,6 +194,32 @@ void Renderer::Draw(Sprite sprite, bool isHighlighted)
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
+void Renderer::DrawRay(b2RayCastInput ray, glm::vec3 colour, float lineWidth)
+{
+	ConfigureShader(_pointToPointLineShaderProgram, -1);
+
+	glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"),
+		colour.x, colour.y, colour.z);
+
+	glm::vec3 startPoint = {ray.origin.x, ray.origin.y, 0};
+	glm::vec3 endPoint = startPoint + glm::vec3(ray.translation.x, ray.translation.y, 0);
+	std::vector<glm::vec3> rayStartAndEndPoints = std::vector<glm::vec3>();
+	rayStartAndEndPoints.push_back(startPoint);
+	rayStartAndEndPoints.push_back(endPoint);
+	
+
+	glBindBuffer(GL_ARRAY_BUFFER, _pointToPointRenderVBO);
+	glBufferData(GL_ARRAY_BUFFER, rayStartAndEndPoints.size() * sizeof(float) * 3, rayStartAndEndPoints.data(), GL_STATIC_DRAW);
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, linePoints.size() * sizeof(glm::vec3), linePoints.data());
+	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(_pointToPointRenderVAO);
+
+
+	glLineWidth(lineWidth);
+	glDrawArrays(GL_LINES, 0, rayStartAndEndPoints.size());
+}
+
 void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 {
 	b2Vec2 bodyPos = b2Body_GetPosition(body.GetId());

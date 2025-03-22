@@ -45,6 +45,8 @@ public:
 	float halfWidth;
 	float halfHeight;
 
+	std::vector<b2Vec2> GetVerticesFacingPosition(b2Vec2 direction);
+
 private:
 	b2BodyId _bodyId;
 	b2WorldId _worldId;

@@ -30,13 +30,13 @@
     <ClCompile Include="Source\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\World.cpp">
+    <ClCompile Include="Source\World\World.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SpriteAnimated.cpp">
+    <ClCompile Include="Source\Player\SpriteAnimated.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Player.cpp">
+    <ClCompile Include="Source\Player\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\PhysicsBody.cpp">
@@ -66,16 +66,16 @@
     <ClCompile Include="Source\GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\PhysicsProp.cpp">
+    <ClCompile Include="Source\Props\PhysicsProp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\CircleProp.cpp">
+    <ClCompile Include="Source\Props\CircleProp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\RectangleProp.cpp">
+    <ClCompile Include="Source\Props\RectangleProp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SpriteProp.cpp">
+    <ClCompile Include="Source\Props\SpriteProp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,13 +92,13 @@
     <ClInclude Include="Source\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\World.h">
+    <ClInclude Include="Source\World\World.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SpriteAnimated.h">
+    <ClInclude Include="Source\Player\SpriteAnimated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Player.h">
+    <ClInclude Include="Source\Player\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\PhysicsBody.h">
@@ -110,16 +110,16 @@
     <ClInclude Include="Source\GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\PhysicsProp.h">
+    <ClInclude Include="Source\Props\PhysicsProp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\CircleProp.h">
+    <ClInclude Include="Source\Props\CircleProp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\RectangleProp.h">
+    <ClInclude Include="Source\Props\RectangleProp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SpriteProp.h">
+    <ClInclude Include="Source\Props\SpriteProp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
