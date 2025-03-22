@@ -124,6 +124,19 @@ void Renderer::Init(const Window& window)
 
 	// ---------------------------
 
+	// --------------------------- Creating arbitrary sized quads for shadow casting
+
+	glGenVertexArrays(1, &_shadowcastQuadRenderVAO);
+	glBindVertexArray(_shadowcastQuadRenderVAO);
+
+	glGenBuffers(1, &_shadowcastQuadRenderVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _shadowcastQuadRenderVBO);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// ---------------------------
+
 	// Vertex shader ---------------------------------
 
 	
@@ -169,6 +182,17 @@ void Renderer::Init(const Window& window)
 		glDeleteShader(fragmentShader);
 	}
 
+	{
+		unsigned int vertexShader = CreateVertexShader("pointToPointLine.vsh");
+		unsigned int fragmentShader = CreateFragmentShader("shadowcast.fsh");
+		unsigned int shadowcastShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
+
+		_shadowcastShaderProgram = shadowcastShaderProgram;
+
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+	}
+
 
 	// ------------------------
 
@@ -192,6 +216,18 @@ void Renderer::Draw(Sprite sprite, bool isHighlighted)
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Renderer::DrawShadowcastQuad(std::vector<glm::vec3> vertices) {
+	ConfigureShader(_shadowcastShaderProgram, -1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, _shadowcastQuadRenderVBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) * 3, vertices.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(_shadowcastQuadRenderVAO);
+
+	glDrawArrays(GL_TRIANGLE_FAN, 0, vertices.size());
 }
 
 void Renderer::DrawRay(b2RayCastInput ray, glm::vec3 colour, float lineWidth)

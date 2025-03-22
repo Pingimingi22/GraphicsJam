@@ -19,6 +19,7 @@ private:
 	unsigned int _flipbookShaderProgram;
 	unsigned int _lineShaderProgram;
 	unsigned int _pointToPointLineShaderProgram;
+	unsigned int _shadowcastShaderProgram;
 
 	std::string ReadShader(std::string path);
 
@@ -30,6 +31,9 @@ private:
 
 	unsigned int _pointToPointRenderVBO;
 	unsigned int _pointToPointRenderVAO;
+
+	unsigned int _shadowcastQuadRenderVBO;
+	unsigned int _shadowcastQuadRenderVAO;
 
 public:
 	static Renderer* Instance;
@@ -53,6 +57,7 @@ public:
 	void Draw(SpriteAnimated sprite, float deltaTime);
 	void DrawGizmo(PhysicsBody body, glm::vec3 colour);
 	void DrawRay(b2RayCastInput ray, glm::vec3 colour, float lineWidth=2.5f);
+	void DrawShadowcastQuad(std::vector<glm::vec3> vertices);
 	void SetCameraPos(float x, float y);
 
 private:

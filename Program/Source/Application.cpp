@@ -15,6 +15,7 @@
 #include "CircleProp.h"
 #include "RectangleProp.h"
 #include "SpriteProp.h"
+#include <algorithm>
 
 Application* Application::Instance = nullptr;
 
@@ -152,10 +153,7 @@ void Application::Run()
 			}
 		}
 		
-		for (int i = 0; i < gameObjects.size(); i++) {
-			gameObjects[i]->Update();
-			gameObjects[i]->Draw();
-		}
+		
 
 		// Hack code to test raycast to closest vertices.
 		// If at least one object has been placed down, we'll use it for our raycast
@@ -163,16 +161,75 @@ void Application::Run()
 		if (_debugProp != nullptr) {
 			b2Vec2 playerPosition = { player->GetPosition().x, player->GetPosition().y };
 			std::vector<b2Vec2> vertices = _debugProp->GetVerticesFacingPosition(playerPosition);
-			for (int i = 0; i < vertices.size(); i++) {
-				b2RayCastInput testRay;
-				testRay.origin = { player->GetPosition().x, player->GetPosition().y };
-				testRay.translation = vertices[i] - testRay.origin;
-				renderer.DrawRay(testRay, glm::vec3(0, 1, 0));
+
+			std::vector<glm::vec3> shadowcastQuad = std::vector<glm::vec3>();
+			std::vector<b2Vec2> shadowcastVertices = std::vector<b2Vec2>();
+
+			glm::vec3 sumOfAllPositions = glm::vec3(0);
+			if (vertices.size() > 0) {
+				for (int i = 0; i < vertices.size(); i++) {
+					b2RayCastInput testRay;
+					testRay.origin = { player->GetPosition().x, player->GetPosition().y };
+					testRay.translation = vertices[i] - testRay.origin;
+					renderer.DrawRay(testRay, glm::vec3(0, 1, 0));
+
+					shadowcastVertices.push_back(vertices[i]);
+					glm::vec2 playerToVertexPos = glm::vec2(vertices[i].x, vertices[i].y) - player->GetPosition();
+					playerToVertexPos = glm::normalize(playerToVertexPos);
+					b2Vec2 playerToVertexDir = { playerToVertexPos.x, playerToVertexPos.y };
+
+					b2Vec2 modifiedVec;
+					modifiedVec = vertices[i] + playerToVertexDir * 10.0f;
+					//shadowcastVertices.push_back(modifiedVec);
+
+					sumOfAllPositions += glm::vec3(vertices[i].x, vertices[i].y, 0);
+					//sumOfAllPositions += glm::vec3(modifiedVec.x, modifiedVec.y, 0);
+				}
+				for (int i = 0; i < vertices.size(); i++) {
+					glm::vec2 playerToVertexPos = glm::vec2(vertices[i].x, vertices[i].y) - player->GetPosition();
+					playerToVertexPos = glm::normalize(playerToVertexPos);
+					b2Vec2 playerToVertexDir = { playerToVertexPos.x, playerToVertexPos.y };
+
+					b2Vec2 modifiedVec;
+					modifiedVec = vertices[i] + playerToVertexDir * 100.0f;
+				    shadowcastVertices.push_back(modifiedVec);
+					sumOfAllPositions += glm::vec3(modifiedVec.x, modifiedVec.y, 0);
+				}
+
+				
+			
+				glm::vec3 centrePointOfVerts = glm::vec3(
+					sumOfAllPositions.x / shadowcastVertices.size(),
+					sumOfAllPositions.y / shadowcastVertices.size(),
+					sumOfAllPositions.z / shadowcastVertices.size());
+
+				// Sort counterclockwise
+				std::sort(shadowcastVertices.begin(), shadowcastVertices.end(), [centrePointOfVerts](auto& a, auto& b) {
+					return atan2(a.y - centrePointOfVerts.y, a.x - centrePointOfVerts.x) < atan2(b.y - centrePointOfVerts.y, b.x - centrePointOfVerts.x);
+				});
+
+				for (int i = shadowcastVertices.size()-1; i > 0; i--) {
+					shadowcastQuad.push_back(glm::vec3(shadowcastVertices[i].x, shadowcastVertices[i].y, 0));
+				}
+
+				shadowcastQuad.push_back(glm::vec3(shadowcastVertices[0].x, shadowcastVertices[0].y, 0));
+
+			
+				renderer.DrawShadowcastQuad(shadowcastQuad);
 			}
 		}
 
-		m_Window->ProcessEvents();
+		for (int i = 0; i < gameObjects.size(); i++) {
+			gameObjects[i]->Update();
+			gameObjects[i]->Draw();
+		}
+		
+		
+		
 
+
+		m_Window->ProcessEvents();
+		
 		if (ImGui::Button("Reset player")) {
 			b2Vec2 newPlayerPos = b2Vec2();
 			newPlayerPos.x = 0;
