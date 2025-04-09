@@ -230,6 +230,30 @@ void Renderer::DrawShadowcastQuad(std::vector<glm::vec3> vertices) {
 	glDrawArrays(GL_TRIANGLE_FAN, 0, vertices.size());
 }
 
+void Renderer::DrawCircle(glm::vec2 position, float radius, glm::vec3 colour) 
+{
+	glm::mat4 modelMat =
+		glm::translate(
+			glm::mat4(1.0f),
+			{position.x, position.y, 0}) *
+		glm::scale(
+			glm::mat4(1.0f),
+			glm::vec3(radius, radius, 1.0f));
+
+	ConfigureShader(
+		_lineShaderProgram,
+		-1,
+		modelMat);
+
+	glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"),
+		colour.x, colour.y, colour.z);
+
+	glBindVertexArray(_circleRenderVAO);
+
+	glLineWidth(2.0f);
+	glDrawArrays(GL_LINE_LOOP, 0, _unitCircleVerts.size());
+}
+
 void Renderer::DrawRay(b2RayCastInput ray, glm::vec3 colour, float lineWidth)
 {
 	ConfigureShader(_pointToPointLineShaderProgram, -1);

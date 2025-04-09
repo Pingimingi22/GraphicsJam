@@ -59,6 +59,7 @@ public:
 	void DrawRay(b2RayCastInput ray, glm::vec3 colour, float lineWidth=2.5f);
 	void DrawShadowcastQuad(std::vector<glm::vec3> vertices);
 	void SetCameraPos(float x, float y);
+	void DrawCircle(glm::vec2 position, float radius, glm::vec3 colour);
 
 private:
 	void ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat);

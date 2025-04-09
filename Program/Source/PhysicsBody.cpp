@@ -199,8 +199,23 @@ std::vector<b2Vec2> PhysicsBody::GetVerticesFacingPosition(b2Vec2 position)
 			edgeVertex1 = { glmEdgeVertex1.x, glmEdgeVertex1.y };
 			edgeVertex2 = { glmEdgeVertex2.x, glmEdgeVertex2.y };
 
-			verticesFacingPosition.push_back(edgeVertex1);
-			verticesFacingPosition.push_back(edgeVertex2);
+			int prevIndex = (verticesFacingPosition.size()-1);
+			// Hack to avoid adding duplicate vertex.
+			if (verticesFacingPosition.size() >= 1 &&
+				edgeVertex1.x == verticesFacingPosition[prevIndex].x && edgeVertex1.y == verticesFacingPosition[prevIndex].y) {
+			}
+			else {
+				verticesFacingPosition.push_back(edgeVertex1);
+			}
+
+			if (verticesFacingPosition.size() >= 1 &&
+				verticesFacingPosition[0].x == edgeVertex2.x && verticesFacingPosition[0].y == edgeVertex2.y) {
+
+			}
+			else {
+				verticesFacingPosition.push_back(edgeVertex2);
+			}
+
 		}
 	}
 
