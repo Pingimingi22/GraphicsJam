@@ -152,16 +152,6 @@ std::vector<b2Vec2> PhysicsBody::GetVerticesFacingPosition(b2Vec2 position)
 		glm::translate(glm::mat4(1), { GetPosition().x, GetPosition().y, 0}) *
 		glm::rotate(glm::mat4(1), GetRotation(), glm::vec3(0, 0, 1));
 	glm::vec4 centroidWorldSpace = localToWorld * glm::vec4(polygon.centroid.x, polygon.centroid.y, 0, 1);
-	
-	/*
-	glm::vec4 centroidToPositionWorldSpace =
-		glm::vec4(position.x, position.y, 0, 1) -
-		glm::vec4(centroidWorldSpace.x, centroidWorldSpace.y, 0, 1);
-	centroidToPositionWorldSpace = glm::normalize(centroidToPositionWorldSpace);
-	*/
-	
-
-	
 
 	// Looping though count-1 since we're getting edges rather than vertices.
 	for (int i = 0; i < polygon.count; i++) {
