@@ -8,5 +8,6 @@ public:
 	virtual bool IsPointOverlapping(glm::vec2 point);
 	virtual void ShowUI();
 	virtual void Draw();
+	virtual void DrawShadow(glm::vec2 playerPosition);
 	virtual void ShowTooltip();
 };

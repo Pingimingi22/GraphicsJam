@@ -68,6 +68,11 @@ void SpriteProp::Draw()
 	Renderer::Instance->Draw(*_sprite, _isHovered);
 }
 
+void SpriteProp::DrawShadow(glm::vec2 playerPosition)
+{
+
+}
+
 void SpriteProp::Update()
 {
 	if (_physics->GetMouseJointId().index1 != 0) {

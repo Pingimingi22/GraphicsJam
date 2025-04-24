@@ -137,9 +137,6 @@ void Application::Run()
 
 		player->Update(deltaTime, m_Window);
 		renderer.Draw(*player->GetAnimatedSprite(), deltaTime);
-
-		
-
 	
 		if (_drawPlayerColliders) {
 			renderer.DrawGizmo(player->GetPhysicsBody(), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -153,8 +150,6 @@ void Application::Run()
 			}
 		}
 		
-		
-
 		// Hack code to test raycast to closest vertices.
 		// If at least one object has been placed down, we'll use it for our raycast
 		// test.
@@ -193,7 +188,7 @@ void Application::Run()
 					b2Vec2 playerToVertexDir = { playerToVertexPos.x, playerToVertexPos.y };
 
 					b2Vec2 modifiedVec;
-					modifiedVec = vertices[i] + playerToVertexDir * 75.0f;
+					modifiedVec = vertices[i] + playerToVertexDir * 100.0f;
 				    shadowcastVertices.push_back(modifiedVec);
 					sumOfAllPositions += glm::vec3(modifiedVec.x, modifiedVec.y, 0);
 				}
@@ -204,7 +199,7 @@ void Application::Run()
 					sumOfAllPositions.y / shadowcastVertices.size(),
 					sumOfAllPositions.z / shadowcastVertices.size());
 
-				renderer.DrawCircle(centrePointOfVerts, 0.25f, glm::vec3(0, 1, 0));
+				//renderer.DrawCircle(centrePointOfVerts, 0.25f, glm::vec3(0, 1, 0));
 
 				// Sort counterclockwise
 				std::sort(shadowcastVertices.begin(), shadowcastVertices.end(), [centrePointOfVerts](auto& a, auto& b) {
@@ -219,11 +214,12 @@ void Application::Run()
 					b2Vec2 currentToNext = shadowcastVertices[nextIndex] - shadowcastVertices[i];
 
 					float cross = b2Cross(prevToCurrent, currentToNext);
-					if (cross < 0) {
+					if (cross <= 0) {
 						if (i == 0) {
 							ImGui::Text("First vertex is concave!!!");
 						}
 						renderer.DrawCircle({ shadowcastVertices[i].x, shadowcastVertices[i].y }, 0.25f+i*0.1f, glm::vec3(0.25f+i*0.25f, 0+i*0.15f, 0));
+						shadowcastQuad.push_back({ shadowcastVertices[i].x, shadowcastVertices[i].y, 0 });
 					}
 					else {
 						renderer.DrawCircle({ shadowcastVertices[i].x, shadowcastVertices[i].y }, 0.25f+i*0.1f, glm::vec3(0.25f+i*0.25f, 0+i*0.15f, 0));
@@ -235,12 +231,9 @@ void Application::Run()
 				shadowcastQuad.push_back(glm::vec3(shadowcastQuad[1].x, shadowcastQuad[1].y, 0));
 
 				renderer.DrawShadowcastQuad(shadowcastQuad);
-				
 			}
 		}
 
-		
-		
 		for (int i = 0; i < gameObjects.size(); i++) {
 			gameObjects[i]->Update();
 			gameObjects[i]->Draw();

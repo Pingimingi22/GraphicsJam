@@ -65,6 +65,11 @@ void RectangleProp::Draw()
 	Renderer::Instance->DrawGizmo(*_physics, glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
+void RectangleProp::DrawShadow(glm::vec2 playerPosition)
+{
+	
+}
+
 void RectangleProp::ShowTooltip()
 {
 	ImGui::BeginTooltip();

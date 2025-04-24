@@ -153,15 +153,15 @@ std::vector<b2Vec2> PhysicsBody::GetVerticesFacingPosition(b2Vec2 position)
 		glm::rotate(glm::mat4(1), GetRotation(), glm::vec3(0, 0, 1));
 	glm::vec4 centroidWorldSpace = localToWorld * glm::vec4(polygon.centroid.x, polygon.centroid.y, 0, 1);
 	
+	/*
 	glm::vec4 centroidToPositionWorldSpace =
 		glm::vec4(position.x, position.y, 0, 1) -
 		glm::vec4(centroidWorldSpace.x, centroidWorldSpace.y, 0, 1);
 	centroidToPositionWorldSpace = glm::normalize(centroidToPositionWorldSpace);
+	*/
 	
-	b2RayCastInput testRay;
-	testRay.origin = { centroidWorldSpace.x, centroidWorldSpace.y };
-	testRay.translation = { centroidToPositionWorldSpace.x*10, centroidToPositionWorldSpace.y*10 };
-	Renderer::Instance->DrawRay(testRay, glm::vec3(1, 1, 1), 3.5f);
+
+	
 
 	// Looping though count-1 since we're getting edges rather than vertices.
 	for (int i = 0; i < polygon.count; i++) {
@@ -169,53 +169,71 @@ std::vector<b2Vec2> PhysicsBody::GetVerticesFacingPosition(b2Vec2 position)
 			glm::vec4(polygon.normals[i].x, polygon.normals[i].y, 0, 0);
 		//edgeNormalWorldSpace = glm::normalize(edgeNormalWorldSpace);
 		
+		/*
 		b2RayCastInput testRay;
 		testRay.origin = { centroidWorldSpace.x, centroidWorldSpace.y };
 		testRay.translation = { edgeNormalWorldSpace.x * 10, edgeNormalWorldSpace.y * 10 };
 		Renderer::Instance->DrawRay(testRay, glm::vec3(0.5, 0.5, 1));
+		*/
 
-		float dotValue = glm::dot(centroidToPositionWorldSpace, edgeNormalWorldSpace);
+		b2Vec2 edgeVertex1;
+		b2Vec2 edgeVertex2;
+
+		glm::vec4 glmEdgeVertex1 = localToWorld * glm::vec4(
+			polygon.vertices[i].x,
+			polygon.vertices[i].y, 0, 1);
+
+		glm::vec4 glmEdgeVertex2;
+		if (i != 3) {
+			glmEdgeVertex2 = localToWorld * glm::vec4(
+				polygon.vertices[i + 1].x,
+				polygon.vertices[i + 1].y, 0, 1);
+		}
+		else {
+			glmEdgeVertex2 = localToWorld * glm::vec4(
+				polygon.vertices[0].x,
+				polygon.vertices[0].y, 0, 1);
+		}
+
+		glm::vec3 edgeCenter = (glmEdgeVertex1 + glmEdgeVertex2);
+		edgeCenter.x /= 2;
+		edgeCenter.y /= 2;
+		//edgeCenter.z /= 2;
+
+		glm::vec4 edgeCenterToPositionWorldSpace =
+			glm::vec4(position.x, position.y, 0, 1) -
+			glm::vec4(edgeCenter.x, edgeCenter.y, 0, 1);
+		edgeCenterToPositionWorldSpace = glm::normalize(edgeCenterToPositionWorldSpace);
+
+		b2RayCastInput testRay;
+		testRay.origin = { edgeCenter.x, edgeCenter.y };
+		testRay.translation = { edgeCenterToPositionWorldSpace.x * 10, edgeCenterToPositionWorldSpace.y * 10 };
+		Renderer::Instance->DrawRay(testRay, glm::vec3(1, 1, 1), 3.5f);
+
+
+		float dotValue = glm::dot(edgeCenterToPositionWorldSpace, edgeNormalWorldSpace);
+
+		
 		if (dotValue > 0) {
-			b2Vec2 edgeVertex1;
-			b2Vec2 edgeVertex2;
-			
-			glm::vec4 glmEdgeVertex1 = localToWorld * glm::vec4(
-				polygon.vertices[i].x,
-				polygon.vertices[i].y, 0, 1);
-
-			glm::vec4 glmEdgeVertex2;
-			if (i != 3) {
-				glmEdgeVertex2 = localToWorld * glm::vec4(
-					polygon.vertices[i + 1].x,
-					polygon.vertices[i + 1].y, 0, 1);
-			}
-			else {
-				glmEdgeVertex2 = localToWorld * glm::vec4(
-					polygon.vertices[0].x,
-					polygon.vertices[0].y, 0, 1);
-			}
-			
-
 			edgeVertex1 = { glmEdgeVertex1.x, glmEdgeVertex1.y };
 			edgeVertex2 = { glmEdgeVertex2.x, glmEdgeVertex2.y };
 
 			int prevIndex = (verticesFacingPosition.size()-1);
-			// Hack to avoid adding duplicate vertex.
-			if (verticesFacingPosition.size() >= 1 &&
-				edgeVertex1.x == verticesFacingPosition[prevIndex].x && edgeVertex1.y == verticesFacingPosition[prevIndex].y) {
+
+			bool alreadyHasVertex1 = false;
+			bool alreadyHasVertex2 = false;
+			for (int i = 0; i < verticesFacingPosition.size(); i++) {
+
+				alreadyHasVertex1 = verticesFacingPosition[i] == edgeVertex1;
+				alreadyHasVertex2 = verticesFacingPosition[i] == edgeVertex2;
 			}
-			else {
+
+			if (!alreadyHasVertex1)
 				verticesFacingPosition.push_back(edgeVertex1);
-			}
-
-			if (verticesFacingPosition.size() >= 1 &&
-				verticesFacingPosition[0].x == edgeVertex2.x && verticesFacingPosition[0].y == edgeVertex2.y) {
-
-			}
-			else {
+	
+			if(!alreadyHasVertex2)
 				verticesFacingPosition.push_back(edgeVertex2);
-			}
-
+	
 		}
 	}
 

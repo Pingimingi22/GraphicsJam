@@ -24,6 +24,10 @@ void GameObject::Draw()
 {
 }
 
+void GameObject::DrawShadow(glm::vec2 playerPosition) 
+{
+}
+
 void GameObject::Update()
 {
 }

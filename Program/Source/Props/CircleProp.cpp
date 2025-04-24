@@ -39,6 +39,11 @@ void CircleProp::Draw()
 	Renderer::Instance->DrawGizmo(*_physics, glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
+void CircleProp::DrawShadow(glm::vec2 playerPosition)
+{
+
+}
+
 void CircleProp::ShowTooltip()
 {
 	ImGui::BeginTooltip();

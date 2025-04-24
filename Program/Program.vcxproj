@@ -120,6 +120,7 @@
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\EntryPoint.cpp" />
     <ClCompile Include="Source\Props\SpriteProp.cpp" />
+    <ClCompile Include="Source\Shadowcaster.cpp" />
     <ClCompile Include="Source\Window.cpp" />
     <ClCompile Include="Source\Sprite.cpp" />
     <ClCompile Include="Source\World\World.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Props\SpriteProp.h" />
+    <ClInclude Include="Source\Shadowcaster.h" />
     <ClInclude Include="Source\Window.h" />
     <ClInclude Include="Source\Sprite.h" />
     <ClInclude Include="Source\World\World.h" />

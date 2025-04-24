@@ -15,6 +15,7 @@ public:
 	virtual bool IsPointOverlapping(glm::vec2 point) = 0;
 	virtual void ShowUI() = 0;
 	virtual void Draw() = 0;
+	virtual void DrawShadow(glm::vec2 playerPosition) = 0;
 
 	std::vector<b2Vec2> GetVerticesFacingPosition(b2Vec2 direction);
 };
