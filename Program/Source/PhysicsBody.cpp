@@ -167,14 +167,6 @@ std::vector<b2Vec2> PhysicsBody::GetVerticesFacingPosition(b2Vec2 position)
 	for (int i = 0; i < polygon.count; i++) {
 		glm::vec4 edgeNormalWorldSpace = localToWorld * 
 			glm::vec4(polygon.normals[i].x, polygon.normals[i].y, 0, 0);
-		//edgeNormalWorldSpace = glm::normalize(edgeNormalWorldSpace);
-		
-		/*
-		b2RayCastInput testRay;
-		testRay.origin = { centroidWorldSpace.x, centroidWorldSpace.y };
-		testRay.translation = { edgeNormalWorldSpace.x * 10, edgeNormalWorldSpace.y * 10 };
-		Renderer::Instance->DrawRay(testRay, glm::vec3(0.5, 0.5, 1));
-		*/
 
 		b2Vec2 edgeVertex1;
 		b2Vec2 edgeVertex2;
@@ -198,7 +190,6 @@ std::vector<b2Vec2> PhysicsBody::GetVerticesFacingPosition(b2Vec2 position)
 		glm::vec3 edgeCenter = (glmEdgeVertex1 + glmEdgeVertex2);
 		edgeCenter.x /= 2;
 		edgeCenter.y /= 2;
-		//edgeCenter.z /= 2;
 
 		glm::vec4 edgeCenterToPositionWorldSpace =
 			glm::vec4(position.x, position.y, 0, 1) -
