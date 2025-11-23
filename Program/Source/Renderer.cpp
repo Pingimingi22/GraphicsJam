@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include "box2d/types.h"
+#include "Managers/Shader/ShaderManager.h"
 
 Renderer* Renderer::Instance = nullptr;
 
@@ -29,26 +30,6 @@ static float _outlineShape[] =
 	0.5f, -0.5f,  0.0f,
 	-0.5f, -0.5f,  0.0f,
 };
-
-std::string Renderer::ReadShader(std::string path)
-{
-	std::string fullFile;
-	std::string line;
-	std::ifstream shaderFile(path);
-	if (shaderFile.is_open())
-	{
-		while (std::getline(shaderFile, line)) {
-			//std::cout << line << '\n';
-			fullFile.append(line + "\n");
-		}
-		shaderFile.close();
-	}
-	else {
-		std::cout << "Unable to open shader file" << std::endl;
-	}
-
-	return fullFile;
-}
 
 void Renderer::Init(const Window& window)
 {
@@ -139,59 +120,30 @@ void Renderer::Init(const Window& window)
 
 	// Vertex shader ---------------------------------
 
-	
-	{
-		unsigned int vertexShader = CreateVertexShader("vertexShader.vsh");
-		unsigned int fragmentShader = CreateFragmentShader("fragmentShader.fsh");
-		_basicShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
+	ShaderManager::CreateShaderProgram(
+		ShaderProgramNames::Basic, 
+		"vertexShader.vsh",
+		"fragmentShader.fsh");
 
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-	}
+	ShaderManager::CreateShaderProgram(
+		ShaderProgramNames::Flipbook,
+		"vertexShader.vsh",
+		"flipbook.fsh");
 
-	{
-		unsigned int vertexShader = CreateVertexShader("vertexShader.vsh");
-		unsigned int fragmentShader = CreateFragmentShader("flipbook.fsh");
-		unsigned int flipbookShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
+	ShaderManager::CreateShaderProgram(
+		ShaderProgramNames::Line,
+		"vertexShader.vsh",
+		"line.fsh");
 
-		_flipbookShaderProgram = flipbookShaderProgram;
+	ShaderManager::CreateShaderProgram(
+		ShaderProgramNames::PointToPoint,
+		"pointToPointLine.vsh",
+		"pointToPointLine.fsh");
 
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-	}
-
-	{
-		unsigned int vertexShader = CreateVertexShader("vertexShader.vsh");
-		unsigned int fragmentShader = CreateFragmentShader("line.fsh");
-		unsigned int lineShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
-
-		_lineShaderProgram = lineShaderProgram;
-
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-	}
-
-	{
-		unsigned int vertexShader = CreateVertexShader("pointToPointLine.vsh");
-		unsigned int fragmentShader = CreateFragmentShader("pointToPointLine.fsh");
-		unsigned int pointToPointLineShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
-
-		_pointToPointLineShaderProgram = pointToPointLineShaderProgram;
-
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-	}
-
-	{
-		unsigned int vertexShader = CreateVertexShader("pointToPointLine.vsh");
-		unsigned int fragmentShader = CreateFragmentShader("shadowcast.fsh");
-		unsigned int shadowcastShaderProgram = CreateShaderProgram(vertexShader, fragmentShader);
-
-		_shadowcastShaderProgram = shadowcastShaderProgram;
-
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-	}
+	ShaderManager::CreateShaderProgram(
+		ShaderProgramNames::Shadowcast,
+		"pointToPointLine.vsh",
+		"shadowcast.fsh");
 
 	// ------------------------
 
@@ -216,8 +168,8 @@ void Renderer::Init(const Window& window)
 
 void Renderer::Draw(Sprite sprite, bool isHighlighted)
 {
-	ConfigureShader(
-		_basicShaderProgram, 
+	ShaderManager::UseShaderProgram(
+		ShaderProgramNames::Basic,
 		sprite.GetTextureId(), 
 		sprite.ObjToWorld(),
 		isHighlighted);
@@ -227,7 +179,10 @@ void Renderer::Draw(Sprite sprite, bool isHighlighted)
 }
 
 void Renderer::DrawShadowcastQuad(std::vector<glm::vec3> vertices) {
-	ConfigureShader(_shadowcastShaderProgram, -1);
+	
+	ShaderManager::UseShaderProgram(
+		ShaderProgramNames::Shadowcast, 
+		-1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, _shadowcastQuadRenderVBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) * 3, vertices.data(), GL_STATIC_DRAW);
@@ -249,12 +204,15 @@ void Renderer::DrawCircle(glm::vec2 position, float radius, glm::vec3 colour)
 			glm::mat4(1.0f),
 			glm::vec3(radius, radius, 1.0f));
 
-	ConfigureShader(
-		_lineShaderProgram,
+	ShaderManager::UseShaderProgram(
+		ShaderProgramNames::Line,
 		-1,
 		modelMat);
 
-	glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"),
+	glUniform3f(glGetUniformLocation(
+		ShaderManager::GetProgram(
+			ShaderProgramNames::Line), 
+		"lineColour"),
 		colour.x, colour.y, colour.z);
 
 	glBindVertexArray(_circleRenderVAO);
@@ -265,9 +223,15 @@ void Renderer::DrawCircle(glm::vec2 position, float radius, glm::vec3 colour)
 
 void Renderer::DrawRay(b2RayCastInput ray, glm::vec3 colour, float lineWidth)
 {
-	ConfigureShader(_pointToPointLineShaderProgram, -1);
+	ShaderManager::UseShaderProgram(
+		ShaderProgramNames::PointToPoint, 
+		-1);
 
-	glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"),
+	glUniform3f(
+		glGetUniformLocation(
+			ShaderManager::GetProgram(
+				ShaderProgramNames::Line),
+			"lineColour"),
 		colour.x, colour.y, colour.z);
 
 	glm::vec3 startPoint = {ray.origin.x, ray.origin.y, 0};
@@ -313,11 +277,15 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 			//linePoints.push_back(UINT16_MAX)
 		}
 
-		ConfigureShader(
-			_pointToPointLineShaderProgram,
+		ShaderManager::UseShaderProgram (
+			ShaderProgramNames::PointToPoint,
 			-1);
 
-		glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"),
+		glUniform3f(
+			glGetUniformLocation(
+				ShaderManager::GetProgram(
+					ShaderProgramNames::Line),
+				"lineColour"),
 			1, 1, 1);
 
 		glBindBuffer(GL_ARRAY_BUFFER, _pointToPointRenderVBO);
@@ -360,12 +328,16 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 				calculatedRotation,
 				glm::vec3(0.0, 0.0, 1.0f));
 
-		ConfigureShader(
-			_lineShaderProgram,
+		ShaderManager::UseShaderProgram(
+			ShaderProgramNames::Line,
 			-1,
 			modelMat);
 
-		glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"),
+		glUniform3f(
+			glGetUniformLocation(
+				ShaderManager::GetProgram(
+					ShaderProgramNames::Line), 
+				"lineColour"),
 			colour.x, colour.y, colour.z);
 
 		glBindVertexArray(_circleRenderVAO);
@@ -400,12 +372,16 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 		glm::vec3 positionOfEdgeWorldSpace = positionWorldSpace + glm::vec3(1, 0, 0) * aabbsExtents.x;
 
 
-		ConfigureShader(
-			_lineShaderProgram,
+		ShaderManager::UseShaderProgram(
+			ShaderProgramNames::Line,
 			-1,
 			modelMat);
 
-		glUniform3f(glGetUniformLocation(_lineShaderProgram, "lineColour"),
+		glUniform3f(
+			glGetUniformLocation(
+				ShaderManager::GetProgram(
+					ShaderProgramNames::Line),
+				"lineColour"),
 			colour.x, colour.y, colour.z);
 
 		glBindVertexArray(_lineRenderVAO);
@@ -416,131 +392,21 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 	}
 }
 
-unsigned int Renderer::CreateVertexShader(std::string path)
-{
-	// Vertex shader ---------------------------------
-
-	std::string vertexShaderSource = ReadShader(path);
-
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-	const char* vertexShaderSourceC = vertexShaderSource.c_str();
-
-	glShaderSource(vertexShader, 1, &vertexShaderSourceC, NULL);
-	glCompileShader(vertexShader);
-
-	{
-		int success;
-		char infoLog[512];
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-		if (!success) {
-			glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-		}
-	}
-
-	return vertexShader;
-}
-
-unsigned int Renderer::CreateFragmentShader(std::string path)
-{
-	// Fragment shader ---------------------------------
-	std::string fragmentShaderSource = ReadShader(path);
-
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-	const char* fragmentShaderSourceC = fragmentShaderSource.c_str();
-
-	glShaderSource(fragmentShader, 1, &fragmentShaderSourceC, NULL);
-	glCompileShader(fragmentShader);
-
-	{
-		int success;
-		char infoLog[512];
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-		if (!success) {
-			glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-		}
-	}
-
-	return fragmentShader;
-}
-
-unsigned int Renderer::CreateShaderProgram(unsigned int vertexShader, unsigned int fragmentShader)
-{
-	// Creating the shader program.
-	unsigned int newShaderProgram = glCreateProgram();
-	glAttachShader(newShaderProgram, vertexShader);
-	glAttachShader(newShaderProgram, fragmentShader);
-	glLinkProgram(newShaderProgram);
-
-	int success;
-	char infoLog[512];
-	glGetProgramiv(newShaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(newShaderProgram, 512, NULL, infoLog);
-	}
-
-	return newShaderProgram;
-}
-
-void Renderer::ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat)
-{
-	glUseProgram(shaderProgram);
-
-	// Apply uniforms.
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMat"), 1, GL_FALSE, &modelMat[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "viewMat"), 1, GL_FALSE, &camera.GetViewMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, &camera.projectionMatrix[0][0]);
-
-	if (texture != -1) {
-		glBindTexture(GL_TEXTURE_2D, texture);
-	}
-}
-
-void Renderer::ConfigureShader(unsigned int shaderProgram, unsigned int texture)
-{
-	glUseProgram(shaderProgram);
-
-	// Apply uniforms.
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "viewMat"), 1, GL_FALSE, &camera.GetViewMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, &camera.projectionMatrix[0][0]);
-
-	if (texture != -1) {
-		glBindTexture(GL_TEXTURE_2D, texture);
-	}
-}
-
-void Renderer::ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat, bool isHighlighted)
-{
-	glUseProgram(shaderProgram);
-
-	// Apply uniforms.
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMat"), 1, GL_FALSE, &modelMat[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "viewMat"), 1, GL_FALSE, &camera.GetViewMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, &camera.projectionMatrix[0][0]);
-
-	glUniform1i(glGetUniformLocation(shaderProgram, "isHighlighted"), isHighlighted);
-
-	if (texture != -1) {
-		glBindTexture(GL_TEXTURE_2D, texture);
-	}
-}
-
 void Renderer::Draw(SpriteAnimated sprite, float deltaTime)
 {
-	ConfigureShader(
-		_flipbookShaderProgram, 
+	ShaderManager::UseShaderProgram(
+		ShaderProgramNames::Flipbook, 
 		sprite.GetTextureId(), 
 		sprite.ObjToWorld());
 
 	glUniform1i(glGetUniformLocation(
-		_flipbookShaderProgram, 
+		ShaderManager::GetProgram(
+			ShaderProgramNames::Flipbook),
 		"frames"), 
 		8);
 	glUniform1i(glGetUniformLocation(
-		_flipbookShaderProgram, 
+		ShaderManager::GetProgram(
+			ShaderProgramNames::Flipbook),
 		"currentFrame"), 
 		sprite.GetCurrentFrameIndex());
 
@@ -561,22 +427,3 @@ glm::mat4 Renderer::Camera::GetViewMatrix()
 void Renderer::SetCameraPos(float x, float y) {
 	camera.position = glm::vec3(x, y, camera.position.z);
 }
-
-
-/*
-
-	New Renderer design:
-	Renderer::DrawCircle();
-	Renderer::DrawLine();
-
-	Renderer::DrawSprite()
-
-	// ShaderManager:
-	// ShaderManager::Init()
-	// ShaderManager::CreateCircleShader(), etc
-	// ShaderManager::ConfigureShader()
-
-
-
-
-*/

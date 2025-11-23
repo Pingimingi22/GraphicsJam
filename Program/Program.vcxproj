@@ -109,6 +109,8 @@
     <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_tables.cpp" />
     <ClCompile Include="..\ThirdParty\ImGUI\imgui\src\imgui_widgets.cpp" />
+    <ClCompile Include="Source\Managers\Shader\ShaderProgram.cpp" />
+    <ClCompile Include="Source\Managers\Shader\ShaderManager.cpp" />
     <ClCompile Include="Source\Props\CircleProp.cpp" />
     <ClCompile Include="Source\GameObject.cpp" />
     <ClCompile Include="Source\InputManager.cpp" />
@@ -127,6 +129,8 @@
     <ClCompile Include="Source\Player\SpriteAnimated.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Managers\Shader\ShaderProgram.h" />
+    <ClInclude Include="Source\Managers\Shader\ShaderManager.h" />
     <ClInclude Include="Source\Props\CircleProp.h" />
     <ClInclude Include="Source\GameObject.h" />
     <ClInclude Include="Source\InputManager.h" />

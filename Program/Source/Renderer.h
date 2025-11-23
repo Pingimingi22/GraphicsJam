@@ -15,14 +15,6 @@ private:
 	unsigned int VBO;
 	unsigned int VAO;
 
-	unsigned int _basicShaderProgram;
-	unsigned int _flipbookShaderProgram;
-	unsigned int _lineShaderProgram;
-	unsigned int _pointToPointLineShaderProgram;
-	unsigned int _shadowcastShaderProgram;
-
-	std::string ReadShader(std::string path);
-
 	unsigned int _lineRenderVBO;
 	unsigned int _lineRenderVAO;
 
@@ -62,15 +54,6 @@ public:
 	void DrawCircle(glm::vec2 position, float radius, glm::vec3 colour);
 
 private:
-	void ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat);
-	void ConfigureShader(unsigned int shaderProgram, unsigned int texture, glm::mat4 modelMat, bool isHighlighted);
-	void ConfigureShader(unsigned int shaderProgram, unsigned int texture);
-
-	unsigned int CreateVertexShader(std::string path);
-	unsigned int CreateFragmentShader(std::string path);
-
-	unsigned int CreateShaderProgram(unsigned int vertexShader, unsigned int fragmentShader);
-
 	std::vector<glm::vec3> _unitCircleVerts;
 };
 
