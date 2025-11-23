@@ -27,6 +27,8 @@ private:
 	unsigned int _shadowcastQuadRenderVBO;
 	unsigned int _shadowcastQuadRenderVAO;
 
+	unsigned int _drawCallCounter = 0;
+
 public:
 	static Renderer* Instance;
 
@@ -52,6 +54,9 @@ public:
 	void DrawShadowcastQuad(std::vector<glm::vec3> vertices);
 	void SetCameraPos(float x, float y);
 	void DrawCircle(glm::vec2 position, float radius, glm::vec3 colour);
+
+	unsigned int GetDrawCallsThisFrame();
+	void Flush();
 
 private:
 	std::vector<glm::vec3> _unitCircleVerts;

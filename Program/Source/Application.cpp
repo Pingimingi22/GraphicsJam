@@ -263,6 +263,9 @@ void Application::Run()
 			}
 			ImGui::EndPopup();
 		}
+
+		std::string drawCalls = std::string("Draw calls " + std::to_string(Renderer::Instance->GetDrawCallsThisFrame()));
+		ImGui::Text(drawCalls.c_str());
 		
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -270,6 +273,8 @@ void Application::Run()
 		m_Window->SwapBuffers();
 
 		previousTime = currentTime;
+
+		Renderer::Instance->Flush();
 	}
 }
 

@@ -175,6 +175,7 @@ void Renderer::Draw(Sprite sprite, bool isHighlighted)
 		isHighlighted);
 
 	glBindVertexArray(VAO);
+	_drawCallCounter++;
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
@@ -191,6 +192,7 @@ void Renderer::DrawShadowcastQuad(std::vector<glm::vec3> vertices) {
 
 	glBindVertexArray(_shadowcastQuadRenderVAO);
 
+	_drawCallCounter++;
 	glDrawArrays(GL_TRIANGLE_FAN, 0, vertices.size());
 }
 
@@ -218,6 +220,8 @@ void Renderer::DrawCircle(glm::vec2 position, float radius, glm::vec3 colour)
 	glBindVertexArray(_circleRenderVAO);
 
 	glLineWidth(2.0f);
+
+	_drawCallCounter++;
 	glDrawArrays(GL_LINE_LOOP, 0, _unitCircleVerts.size());
 }
 
@@ -250,6 +254,8 @@ void Renderer::DrawRay(b2RayCastInput ray, glm::vec3 colour, float lineWidth)
 
 
 	glLineWidth(lineWidth);
+
+	_drawCallCounter++;
 	glDrawArrays(GL_LINES, 0, rayStartAndEndPoints.size());
 }
 
@@ -297,6 +303,8 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 
 
 		glLineWidth(2.5f);
+
+		_drawCallCounter++;
 		glDrawArrays(GL_LINES, 0, linePoints.size());
 	}
 
@@ -343,6 +351,8 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 		glBindVertexArray(_circleRenderVAO);
 
 		glLineWidth(2.0f);
+
+		_drawCallCounter++;
 		glDrawArrays(GL_LINE_LOOP, 0, _unitCircleVerts.size());
 	}
 	else if (shapeType == b2_polygonShape) {
@@ -388,6 +398,7 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 
 		glLineWidth(2.0f);
 
+		_drawCallCounter++;
 		glDrawArrays(GL_LINE_LOOP, 0, 6);
 	}
 }
@@ -412,6 +423,7 @@ void Renderer::Draw(SpriteAnimated sprite, float deltaTime)
 
 	glBindVertexArray(VAO);
 
+	_drawCallCounter++;
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
@@ -426,4 +438,12 @@ glm::mat4 Renderer::Camera::GetViewMatrix()
 
 void Renderer::SetCameraPos(float x, float y) {
 	camera.position = glm::vec3(x, y, camera.position.z);
+}
+
+unsigned int Renderer::GetDrawCallsThisFrame() {
+	return _drawCallCounter;
+}
+
+void Renderer::Flush() {
+	_drawCallCounter = 0;
 }
