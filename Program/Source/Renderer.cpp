@@ -193,12 +193,20 @@ void Renderer::Init(const Window& window)
 		glDeleteShader(fragmentShader);
 	}
 
-
 	// ------------------------
 
-	float halfWidth = 0.5f * 75;
-	float halfHeight = (float)window.Height()/window.Width() * 75;
-	camera.projectionMatrix = glm::ortho(-halfWidth, halfWidth, -halfHeight/2, halfHeight/2, -100.0f, 100.0f);
+	float zoom = 25.0f;
+	float aspectRatio = (float)window.Width() / window.Height();
+
+	//float halfWidth = (float)window.Width() / 2 * zoom; //0.5f * zoom;
+	//float halfHeight = (float)window.Height() / 2 * zoom; //aspectRatio * zoom;
+	camera.projectionMatrix = glm::ortho(
+		-aspectRatio * zoom,
+		aspectRatio * zoom,
+		-zoom,
+		zoom,
+		-100.0f, 
+		100.0f);
 	//camera.projectionMatrix = glm::ortho(0.0f, 1.0f * 10, 0.0f, (float)window.Height()/window.Width() * 10, -100.0f, 100.0f);
 	camera.position = glm::vec3(0.0f, 0.0f, 10.0f);
 
@@ -223,6 +231,7 @@ void Renderer::DrawShadowcastQuad(std::vector<glm::vec3> vertices) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, _shadowcastQuadRenderVBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) * 3, vertices.data(), GL_STATIC_DRAW);
+	
 	glEnableVertexAttribArray(0);
 
 	glBindVertexArray(_shadowcastQuadRenderVAO);
@@ -536,6 +545,7 @@ void Renderer::Draw(SpriteAnimated sprite, float deltaTime)
 		sprite.GetCurrentFrameIndex());
 
 	glBindVertexArray(VAO);
+
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
@@ -551,3 +561,22 @@ glm::mat4 Renderer::Camera::GetViewMatrix()
 void Renderer::SetCameraPos(float x, float y) {
 	camera.position = glm::vec3(x, y, camera.position.z);
 }
+
+
+/*
+
+	New Renderer design:
+	Renderer::DrawCircle();
+	Renderer::DrawLine();
+
+	Renderer::DrawSprite()
+
+	// ShaderManager:
+	// ShaderManager::Init()
+	// ShaderManager::CreateCircleShader(), etc
+	// ShaderManager::ConfigureShader()
+
+
+
+
+*/

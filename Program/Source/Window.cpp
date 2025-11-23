@@ -51,6 +51,8 @@ Window::Window(const std::string& title, uint32_t width, uint32_t height)
 		return;
 	}
 
+	glfwWindowHint(GLFW_STENCIL_BITS, 8);
+
 	// Set gl context version
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -73,6 +75,8 @@ Window::Window(const std::string& title, uint32_t width, uint32_t height)
 	// Set created window as current context
 	glfwMakeContextCurrent(m_NativeWindow);
 
+	glfwSetWindowUserPointer(m_NativeWindow, this);
+
 	// Initialise glad
 	if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress))
 	{
@@ -84,6 +88,13 @@ Window::Window(const std::string& title, uint32_t width, uint32_t height)
 
 	// Success
 	m_Initialised = true;
+
+	glfwSetWindowSizeCallback(m_NativeWindow, [] (GLFWwindow* glfwWindow, int width, int height) {
+			Window* window = (Window*)glfwGetWindowUserPointer(glfwWindow);
+
+			window->m_Width = width;
+			window->m_Height = height;
+		});
 
 	Log("Window successfully created");
 	GPUInfoDump();
@@ -132,8 +143,10 @@ void Window::Clear(float r, float g, float b, float a)
 	// framebuffer being rendered to
 	glClearColor(r, g, b, a);
 
+	glViewport(0, 0, m_Width, m_Height);
+
 	// Clears the framebuffer being rendered to
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void Window::SwapBuffers()
