@@ -115,8 +115,48 @@ void Application::Run()
 
 	float accumulator = 0.0f;
 
+	// Frame buffer test
+
+	unsigned int fbo;
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	
+
+	
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Window->Width(), m_Window->Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//glViewport(0, 0, 200, 200);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+	unsigned int rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Window->Width(), m_Window->Height());
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+		std::cout << "victory dance" << std::endl;
+	}
+
+	//glDeleteFramebuffers(1, &fbo);
+
+	// end of frame buffer test
+
+
 	while (!m_Window->ShouldClose())
 	{
+		glBindFramebuffer(GL_FRAMEBUFFER, rbo);
+		glViewport(0, 0, 890, 500);
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -149,7 +189,7 @@ void Application::Run()
 			}
 		}
 		
-		glClear(GL_STENCIL_BUFFER_BIT);
+		//glClear(GL_STENCIL_BUFFER_BIT);
 
 		
 		for (int i = 0; i < gameObjects.size(); i++) {
@@ -169,6 +209,8 @@ void Application::Run()
 
 		glDisable(GL_STENCIL_TEST);
 		
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		m_Window->Clear(0.15f, 0.15f, 0.15f);
 
 		m_Window->ProcessEvents();
 		
@@ -267,6 +309,10 @@ void Application::Run()
 		std::string drawCalls = std::string("Draw calls " + std::to_string(Renderer::Instance->GetDrawCallsThisFrame()));
 		ImGui::Text(drawCalls.c_str());
 		
+		ImGui::Begin("Game view");
+		ImGui::Image(texture, ImVec2(890, 500), ImVec2(0, 0), ImVec2(1, -1));
+		ImGui::End();
+
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		

@@ -97,7 +97,7 @@ void SpriteProp::DrawShadow(glm::vec2 playerPosition)
 			//sumOfAllPositions += glm::vec3(modifiedVec.x, modifiedVec.y, 0);
 			//renderer.DrawCircle({ shadowcastVertices[i].x, shadowcastVertices[i].y }, 0.25f, glm::vec3(1, 0, 1));
 		}
-		ImGui::Text((std::string("Vertices: ") + std::to_string(vertices.size())).c_str());
+		//ImGui::Text((std::string("Vertices: ") + std::to_string(vertices.size())).c_str());
 		for (int i = 0; i < vertices.size(); i++) {
 			glm::vec2 playerToVertexPos = glm::vec2(vertices[i].x, vertices[i].y) - playerPosition;
 			playerToVertexPos = glm::normalize(playerToVertexPos);
@@ -132,7 +132,7 @@ void SpriteProp::DrawShadow(glm::vec2 playerPosition)
 			float cross = b2Cross(prevToCurrent, currentToNext);
 			if (cross <= 0) {
 				if (i == 0) {
-					ImGui::Text("First vertex is concave!!!");
+					//ImGui::Text("First vertex is concave!!!");
 				}
 				Renderer::Instance->DrawCircle({ shadowcastVertices[i].x, shadowcastVertices[i].y }, 0.25f + i * 0.1f, glm::vec3(0.25f + i * 0.25f, 0 + i * 0.15f, 0));
 				shadowcastQuad.push_back({ shadowcastVertices[i].x, shadowcastVertices[i].y, 0 });
