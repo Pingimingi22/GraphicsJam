@@ -33,6 +33,9 @@ static float _outlineShape[] =
 
 void Renderer::Init(const Window& window)
 {
+	_framebufferManager = FramebufferManager();
+	_framebufferManager.Init();
+
 	Instance = this;
 
 	glGenVertexArrays(1, &VAO);
@@ -446,4 +449,17 @@ unsigned int Renderer::GetDrawCallsThisFrame() {
 
 void Renderer::Flush() {
 	_drawCallCounter = 0;
+}
+
+void Renderer::BindFramebuffer(
+	std::string framebufferName) {
+	
+	_framebufferManager.Bind(framebufferName);
+}
+
+unsigned int Renderer::GetFramebufferTexture(
+	std::string framebufferName) {
+
+	return _framebufferManager.
+		GetFramebufferTexture(framebufferName);
 }

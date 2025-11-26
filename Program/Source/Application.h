@@ -37,7 +37,16 @@ public:
 		float height, 
 		std::vector<GameObject*>* gameObjects);
 
+	// Utility
+	int GetWindowWidth();
+	int GetWindowHeight();
+
 	b2WorldId WorldId;
+
+
+	ImVec2 testWindowSize;
+	ImVec2 testWindowPos;
+
 
 private:
 	Window* m_Window;

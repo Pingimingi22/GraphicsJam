@@ -45,8 +45,18 @@ Application::~Application()
 	delete m_Window;
 }
 
+int Application::GetWindowWidth() {
+	return m_Window->Width();
+}
+
+int Application::GetWindowHeight() {
+	return m_Window->Height();
+}
+
 void Application::Run()
 {
+	
+
 	// Early out if the window failed to create.
 	if (!m_Window->Initialised()) return;
 
@@ -54,6 +64,8 @@ void Application::Run()
 	renderer.Init(*m_Window);
 	InputManager inputManager = InputManager(m_Window);
 	
+
+
 	b2WorldDef worldDef = b2DefaultWorldDef();
 
 	b2Vec2 gravity;
@@ -117,37 +129,6 @@ void Application::Run()
 
 	// Frame buffer test
 
-	unsigned int fbo;
-	glGenFramebuffers(1, &fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	
-
-	
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Window->Width(), m_Window->Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	//glViewport(0, 0, 200, 200);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
-
-	unsigned int rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Window->Width(), m_Window->Height());
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "victory dance" << std::endl;
-	}
-
 	//glDeleteFramebuffers(1, &fbo);
 
 	// end of frame buffer test
@@ -155,11 +136,25 @@ void Application::Run()
 
 	while (!m_Window->ShouldClose())
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, rbo);
+		Renderer::Instance->BindFramebuffer(
+			Framebuffers::Basic);
+
 		glViewport(0, 0, 890, 500);
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
+		
 		ImGui::NewFrame();
+
+		ImGui::BeginMainMenuBar();
+		if (ImGui::BeginMenu("File")) {
+			ImGui::MenuItem("New", "Ctrl+N");
+			ImGui::MenuItem("Open", "Ctrl+O");
+			ImGui::MenuItem("Save", "Ctrl+S");
+			ImGui::MenuItem("Quit", "Ctrl+Q");
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+
 
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - previousTime;
@@ -172,6 +167,11 @@ void Application::Run()
 		// purposes of this base project, it is fine as a temporary solution.
 		m_Window->Clear(0.15f, 0.15f, 0.15f);
 
+		// Testing stuff
+		/*
+			Renderer::BindFramebuffer(Framebuffers.Basic);
+			Renderer::BindFramebuffer(Framebuffers.Shadows);
+		*/
 		
 
 		player->Update(deltaTime, m_Window);
@@ -192,10 +192,14 @@ void Application::Run()
 		//glClear(GL_STENCIL_BUFFER_BIT);
 
 		
+		Renderer::Instance->BindFramebuffer(Framebuffers::Shadows);
+		m_Window->Clear(0.15f, 0.15f, 0.15f);
 		for (int i = 0; i < gameObjects.size(); i++) {
 
 			gameObjects[i]->DrawShadow(player->GetPosition());
 		}
+
+		Renderer::Instance->Instance->BindFramebuffer(Framebuffers::Basic);
 
 
 		for (int i = 0; i < gameObjects.size(); i++) {
@@ -309,9 +313,42 @@ void Application::Run()
 		std::string drawCalls = std::string("Draw calls " + std::to_string(Renderer::Instance->GetDrawCallsThisFrame()));
 		ImGui::Text(drawCalls.c_str());
 		
-		ImGui::Begin("Game view");
-		ImGui::Image(texture, ImVec2(890, 500), ImVec2(0, 0), ImVec2(1, -1));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin("Game view", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs);
+		ImGui::Image(
+			Renderer::Instance->GetFramebufferTexture(
+				Framebuffers::Basic), 
+			ImVec2(711, 400), 
+			ImVec2(0, 0), 
+			ImVec2(1, -1));
+
+		ImVec2 position;
+		position.x = ImGui::GetMousePos().x - ImGui::GetWindowPos().x;
+		position.y = ImGui::GetMousePos().y - ImGui::GetWindowPos().y;
+
+		testWindowPos = ImGui::GetWindowPos();
+		testWindowSize = ImVec2(711, 400);
+
+		ImGui::Image(
+			Renderer::Instance->GetFramebufferTexture(
+				Framebuffers::Shadows),
+			ImVec2(355, 250),
+			ImVec2(0, 0),
+			ImVec2(1, -1));
+
+		
+
+		std::string testString = 
+			"Mouse position relative to window: " + 
+			std::to_string(position.x) + 
+			", " + 
+			std::to_string(position.y);
+
+		ImGui::Text(testString.c_str());
 		ImGui::End();
+		ImGui::PopStyleVar();
+		
+		
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

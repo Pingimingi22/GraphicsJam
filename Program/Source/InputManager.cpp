@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "Renderer.h"
 #include "GLFW/glfw3.h"
+#include "Application.h"
 
 InputManager* InputManager::Instance = nullptr;
 
@@ -15,15 +16,20 @@ glm::vec2 InputManager::GetMouseScreenPoint()
 {
 	double xPos;
 	double yPos;
+
 	glfwGetCursorPos(window->m_NativeWindow, &xPos, &yPos);
 	return glm::vec2(xPos, yPos);
 }
 
 glm::vec3 InputManager::GetMouseWorldPoint()
 {
-	float viewportWidth = window->Width();
-	float viewportHeight = window->Height();
+	float viewportWidth = Application::Instance->testWindowSize.x; //window->Width();
+	float viewportHeight = Application::Instance->testWindowSize.y;//window->Height();
+
 	glm::vec2 mouseScreenSpace = GetMouseScreenPoint();
+	mouseScreenSpace.x = ImGui::GetMousePos().x - Application::Instance->testWindowPos.x;
+	mouseScreenSpace.y = ImGui::GetMousePos().y - Application::Instance->testWindowPos.y;
+
 	float x = (2.0f * mouseScreenSpace.x) / viewportWidth - 1.0f;
 	float y = 1.0f - (2.0f * mouseScreenSpace.y) / viewportHeight;
 	float z = 1.0f;
