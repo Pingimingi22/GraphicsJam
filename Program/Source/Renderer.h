@@ -30,6 +30,9 @@ private:
 
 	unsigned int _drawCallCounter = 0;
 
+	unsigned int _screenQuadVBO;
+	unsigned int _screenQuadVAO;
+
 public:
 	static Renderer* Instance;
 
@@ -54,6 +57,7 @@ public:
 	void DrawRay(b2RayCastInput ray, glm::vec3 colour, float lineWidth=2.5f);
 	void DrawShadowcastQuad(std::vector<glm::vec3> vertices);
 	void DrawCircle(glm::vec2 position, float radius, glm::vec3 colour);
+	void DrawCompositeScreen(unsigned int texture0, unsigned int texture2);
 	void Flush();
 
 	// Utility

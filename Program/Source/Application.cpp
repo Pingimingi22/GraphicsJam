@@ -213,9 +213,17 @@ void Application::Run()
 
 		glDisable(GL_STENCIL_TEST);
 		
+		
+
+		Renderer::Instance->BindFramebuffer(Framebuffers::Composite);
+		m_Window->Clear(0.15f, 0.15f, 0.15f);
+		Renderer::Instance->DrawCompositeScreen(
+			Renderer::Instance->GetFramebufferTexture(Framebuffers::Basic),
+			Renderer::Instance->GetFramebufferTexture(Framebuffers::Shadows));
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		m_Window->Clear(0.15f, 0.15f, 0.15f);
-
+			
 		m_Window->ProcessEvents();
 		
 		if (ImGui::Button("Reset player")) {
@@ -317,7 +325,7 @@ void Application::Run()
 		ImGui::Begin("Game view", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs);
 		ImGui::Image(
 			Renderer::Instance->GetFramebufferTexture(
-				Framebuffers::Basic), 
+				Framebuffers::Composite), 
 			ImVec2(711, 400), 
 			ImVec2(0, 0), 
 			ImVec2(1, -1));
@@ -329,6 +337,7 @@ void Application::Run()
 		testWindowPos = ImGui::GetWindowPos();
 		testWindowSize = ImVec2(711, 400);
 
+		
 		ImGui::Image(
 			Renderer::Instance->GetFramebufferTexture(
 				Framebuffers::Shadows),
@@ -336,7 +345,13 @@ void Application::Run()
 			ImVec2(0, 0),
 			ImVec2(1, -1));
 
-		
+		ImGui::SameLine();
+		ImGui::Image(
+			Renderer::Instance->GetFramebufferTexture(
+				Framebuffers::Basic),
+			ImVec2(355, 250),
+			ImVec2(0, 0),
+			ImVec2(1, -1));
 
 		std::string testString = 
 			"Mouse position relative to window: " + 

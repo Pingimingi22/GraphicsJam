@@ -20,6 +20,20 @@ static float _quadVertices[] =
 	-0.5f, -0.5f,  0.0f,	0.0f, 0.0f, // bottom left
 };
 
+static float _screenVertices[] =
+{
+	// First triangle
+	-1.0f, -1.0f,  0.0f,	0.0f, 0.0f, // btm left
+	-1.0f,  1.0f,  0.0f,	0.0f, 1.0f, // top left
+	 1.0f,  1.0f,  0.0f,	1.0f, 1.0f, // top right
+
+
+	 // Second triangle
+	 1.0f,  1.0f,  0.0f,		1.0f, 1.0f, // top right
+	 1.0f, -1.0f,  0.0f,		1.0f, 0.0f, // bottom right
+	 -1.0f, -1.0f,  0.0f,	0.0f, 0.0f, // bottom left
+};
+
 static float _outlineShape[] =
 {
 	-0.5f, -0.5f,  0.0f,
@@ -37,6 +51,24 @@ void Renderer::Init(const Window& window)
 	_framebufferManager.Init();
 
 	Instance = this;
+
+	// -------------------------- Screen quad stuff:
+
+	glGenVertexArrays(1, &_screenQuadVAO);
+	glBindVertexArray(_screenQuadVAO);
+
+	glGenBuffers(1, &_screenQuadVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _screenQuadVBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(_screenVertices), _screenVertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	// --------------------------
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -148,6 +180,11 @@ void Renderer::Init(const Window& window)
 		"pointToPointLine.vsh",
 		"shadowcast.fsh");
 
+	ShaderManager::CreateShaderProgram(
+		ShaderProgramNames::Composite, 
+		"composite.vsh", 
+		"composite.fsh");
+
 	// ------------------------
 
 	float zoom = 25.0f;
@@ -174,6 +211,7 @@ void Renderer::Draw(Sprite sprite, bool isHighlighted)
 	ShaderManager::UseShaderProgram(
 		ShaderProgramNames::Basic,
 		sprite.GetTextureId(), 
+		std::nullopt,
 		sprite.ObjToWorld(),
 		isHighlighted);
 
@@ -212,6 +250,7 @@ void Renderer::DrawCircle(glm::vec2 position, float radius, glm::vec3 colour)
 	ShaderManager::UseShaderProgram(
 		ShaderProgramNames::Line,
 		-1,
+		std::nullopt,
 		modelMat);
 
 	glUniform3f(glGetUniformLocation(
@@ -288,7 +327,8 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 
 		ShaderManager::UseShaderProgram (
 			ShaderProgramNames::PointToPoint,
-			-1);
+			-1,
+			std::nullopt);
 
 		glUniform3f(
 			glGetUniformLocation(
@@ -342,6 +382,7 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 		ShaderManager::UseShaderProgram(
 			ShaderProgramNames::Line,
 			-1,
+			std::nullopt,
 			modelMat);
 
 		glUniform3f(
@@ -388,6 +429,7 @@ void Renderer::DrawGizmo(PhysicsBody body, glm::vec3 colour)
 		ShaderManager::UseShaderProgram(
 			ShaderProgramNames::Line,
 			-1,
+			std::nullopt,
 			modelMat);
 
 		glUniform3f(
@@ -411,6 +453,7 @@ void Renderer::Draw(SpriteAnimated sprite, float deltaTime)
 	ShaderManager::UseShaderProgram(
 		ShaderProgramNames::Flipbook, 
 		sprite.GetTextureId(), 
+		std::nullopt,
 		sprite.ObjToWorld());
 
 	glUniform1i(glGetUniformLocation(
@@ -425,6 +468,18 @@ void Renderer::Draw(SpriteAnimated sprite, float deltaTime)
 		sprite.GetCurrentFrameIndex());
 
 	glBindVertexArray(VAO);
+
+	_drawCallCounter++;
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Renderer::DrawCompositeScreen(unsigned int texture0, unsigned int texture1) {
+	ShaderManager::UseShaderProgram(
+		ShaderProgramNames::Composite,
+		texture0,
+		texture1);
+
+	glBindVertexArray(_screenQuadVAO);
 
 	_drawCallCounter++;
 	glDrawArrays(GL_TRIANGLES, 0, 6);

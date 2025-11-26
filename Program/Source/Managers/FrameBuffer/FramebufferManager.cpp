@@ -10,16 +10,21 @@ void FramebufferManager::CreateFramebuffers() {
 	int width = Application::Instance->GetWindowWidth();
 	int height = Application::Instance->GetWindowHeight();
 
-	Framebuffer* _basic = Framebuffer::Create(
+	Framebuffer* basic = Framebuffer::Create(
 		Framebuffers::Basic,
 		glm::vec2(width, height));
 
-	Framebuffer* _shadows = Framebuffer::Create(
+	Framebuffer* shadows = Framebuffer::Create(
 		Framebuffers::Shadows,
 		glm::vec2(width, height));
 
-	_buffers[Framebuffers::Basic] = _basic;
-	_buffers[Framebuffers::Shadows] = _shadows;
+	Framebuffer* composite = Framebuffer::Create(
+		Framebuffers::Composite,
+		glm::vec2(width, height));
+
+	_buffers[Framebuffers::Basic] = basic;
+	_buffers[Framebuffers::Shadows] = shadows;
+	_buffers[Framebuffers::Composite] = composite;
 }
 
 Framebuffer* FramebufferManager::GetBuffer(

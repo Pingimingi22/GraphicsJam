@@ -16,6 +16,7 @@ public:
 	static const inline std::string Line = "line";
 	static const inline std::string PointToPoint = "pointToPoint";
 	static const inline std::string Shadowcast = "shadowCast";
+	static const inline std::string Composite = "composite";
 };
 
 enum class ShaderType {
@@ -31,7 +32,8 @@ public:
 
 	static void UseShaderProgram(
 		std::string programName,
-		unsigned int texture,
+		unsigned int texture0,
+		std::optional<unsigned int> texture1 = std::nullopt,
 		std::optional<glm::mat4> modelMat = std::nullopt,
 		std::optional<bool> isHighlighted = std::nullopt);
 

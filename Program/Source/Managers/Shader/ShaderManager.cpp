@@ -100,7 +100,8 @@ std::string ShaderManager::ReadShader(
 
 void ShaderManager::UseShaderProgram(
 	std::string programName,
-	unsigned int texture,
+	unsigned int texture0,
+	std::optional<unsigned int> texture1,
 	std::optional<glm::mat4> modelMat,
 	std::optional<bool> isHighlighted) {
 
@@ -144,7 +145,18 @@ void ShaderManager::UseShaderProgram(
 			isHighlighted.value());
 	}
 
-	if (texture != -1) {
-		glBindTexture(GL_TEXTURE_2D, texture);
+	glActiveTexture(GL_TEXTURE0);
+	if (texture0 != -1) {
+		glBindTexture(GL_TEXTURE_2D, texture0);
+		glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0);
 	}
+
+	if (texture1.has_value()) {
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture1.value());
+		glUniform1i(glGetUniformLocation(shaderProgram, "texture2"), 1);
+	}
+
+	// Go back to texture 0.
+	//glActiveTexture(GL_TEXTURE0);
 }

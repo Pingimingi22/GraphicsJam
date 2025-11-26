@@ -6,6 +6,7 @@ static class Framebuffers {
 public:
 	static const inline std::string Basic = "basic";
 	static const inline std::string Shadows = "shadows";
+	static const inline std::string Composite = "composite";
 };
 
 class FramebufferManager
