@@ -1,9 +1,8 @@
-# OpenGL Base
+# Graphics 2D shadows experiment
 
-This project is used to aleviate the pain of setting up the boiler plate application code every time one wants to create something with OpenGL.
-It includes the bare basics; an entry point, Window class and Application class. It also contains GLFW and "Glad 2.0" ( supporting OpenGL 4.6 ) which includes Vulkan headers for the adventurous.
+## What is this?
+This is a small WIP project that I started as a way for me to play around with a 2D platformer game. Although it became more of a testbed for me to experiment with and learn OpenGL. The main feature that I was working on was a 2D shadow casting system!
 
-Notes:
-- The context version is hardcoded to version 4.5 in the window class, rather than 3.3 for its compatibility
-- The application comes with incredibly simple logging functionality and log all glErrors will be printed due to the current setup
-- The application has no rendering functionality; it was only created to handle context and window creation, and runtime management
+<img width="1276" height="745" alt="image" src="https://github.com/user-attachments/assets/0e04aae3-6eb5-4b98-8d81-e79293e410b5" />
+
+<img width="1268" height="694" alt="2d_shadowcast_demo" src="https://github.com/user-attachments/assets/da4b173f-06b8-413e-befc-1f4f889f07ed" />
