@@ -1,4 +1,4 @@
-# Graphics 2D shadows experiment
+# 2D shadowcasting
 
 ## What is this?
 This is a small WIP project that I started as a way for me to play around with a 2D platformer game. Although it became more of a testbed for me to experiment with and learn OpenGL. The main feature that I was working on was a 2D shadow casting system!
